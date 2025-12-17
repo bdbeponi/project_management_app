@@ -1,0 +1,279 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "question": "What is the capital of France?",
+      "options": [
+        "Paris",
+        "Berlin",
+        "Madrid",
+        "Rome"
+      ],
+      "answer": "Paris"
+    },
+    {
+      "id": 2,
+      "question": "Which planet is known as the Red Planet?",
+      "options": [
+        "Earth",
+        "Mars",
+        "Jupiter",
+        "Saturn"
+      ],
+      "answer": "Mars"
+    },
+    {
+      "id": 3,
+      "question": "Who developed the theory of relativity?",
+      "options": [
+        "Isaac Newton",
+        "Albert Einstein",
+        "Galileo Galilei",
+        "Nikola Tesla"
+      ],
+      "answer": "Albert Einstein"
+    },
+    {
+      "id": 4,
+      "question": "Which is the largest mammal in the world?",
+      "options": [
+        "Elephant",
+        "Blue Whale",
+        "Giraffe",
+        "Hippopotamus"
+      ],
+      "answer": "Blue Whale"
+    },
+    {
+      "id": 5,
+      "question": "What is the chemical symbol of water?",
+      "options": [
+        "H2O",
+        "O2",
+        "CO2",
+        "HO2"
+      ],
+      "answer": "H2O"
+    },
+    {
+      "id": 6,
+      "question": "Which continent is the Sahara Desert located in?",
+      "options": [
+        "Asia",
+        "Africa",
+        "Australia",
+        "South America"
+      ],
+      "answer": "Africa"
+    },
+    {
+      "id": 7,
+      "question": "Which gas do humans exhale during respiration?",
+      "options": [
+        "Oxygen",
+        "Nitrogen",
+        "Carbon Dioxide",
+        "Helium"
+      ],
+      "answer": "Carbon Dioxide"
+    },
+    {
+      "id": 8,
+      "question": "What is the national sport of Japan?",
+      "options": [
+        "Cricket",
+        "Sumo Wrestling",
+        "Karate",
+        "Football"
+      ],
+      "answer": "Sumo Wrestling"
+    },
+    {
+      "id": 9,
+      "question": "Which country is famous for the Eiffel Tower?",
+      "options": [
+        "France",
+        "Italy",
+        "USA",
+        "Germany"
+      ],
+      "answer": "France"
+    },
+    {
+      "id": 10,
+      "question": "What is the smallest prime number?",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "answer": "2"
+    },
+    {
+      "id": 11,
+      "question": "Which is the fastest land animal?",
+      "options": [
+        "Lion",
+        "Tiger",
+        "Cheetah",
+        "Horse"
+      ],
+      "answer": "Cheetah"
+    },
+    {
+      "id": 12,
+      "question": "Which element has the chemical symbol 'O'?",
+      "options": [
+        "Oxygen",
+        "Gold",
+        "Osmium",
+        "Silver"
+      ],
+      "answer": "Oxygen"
+    },
+    {
+      "id": 13,
+      "question": "Who painted the Mona Lisa?",
+      "options": [
+        "Vincent van Gogh",
+        "Leonardo da Vinci",
+        "Pablo Picasso",
+        "Michelangelo"
+      ],
+      "answer": "Leonardo da Vinci"
+    },
+    {
+      "id": 14,
+      "question": "Which is the largest ocean on Earth?",
+      "options": [
+        "Atlantic Ocean",
+        "Indian Ocean",
+        "Pacific Ocean",
+        "Arctic Ocean"
+      ],
+      "answer": "Pacific Ocean"
+    },
+    {
+      "id": 15,
+      "question": "What is the currency of Japan?",
+      "options": [
+        "Dollar",
+        "Yuan",
+        "Yen",
+        "Won"
+      ],
+      "answer": "Yen"
+    },
+    {
+      "id": 16,
+      "question": "Which blood group is known as the universal donor?",
+      "options": [
+        "A",
+        "B",
+        "AB",
+        "O Negative"
+      ],
+      "answer": "O Negative"
+    },
+    {
+      "id": 17,
+      "question": "Which is the longest river in the world?",
+      "options": [
+        "Amazon",
+        "Nile",
+        "Yangtze",
+        "Mississippi"
+      ],
+      "answer": "Nile"
+    },
+    {
+      "id": 18,
+      "question": "Which programming language is used to build Flutter apps?",
+      "options": [
+        "Java",
+        "Kotlin",
+        "Dart",
+        "Swift"
+      ],
+      "answer": "Dart"
+    },
+    {
+      "id": 19,
+      "question": "Who is known as the father of computers?",
+      "options": [
+        "Alan Turing",
+        "Charles Babbage",
+        "Bill Gates",
+        "Steve Jobs"
+      ],
+      "answer": "Charles Babbage"
+    },
+    {
+      "id": 20,
+      "question": "Which country won the FIFA World Cup 2022?",
+      "options": [
+        "Brazil",
+        "France",
+        "Argentina",
+        "Germany"
+      ],
+      "answer": "Argentina"
+    },
+    {
+      "id": 21,
+      "question": "Which is the largest planet in our solar system?",
+      "options": [
+        "Earth",
+        "Mars",
+        "Jupiter",
+        "Saturn"
+      ],
+      "answer": "Jupiter"
+    },
+    {
+      "id": 22,
+      "question": "What is the boiling point of water at sea level?",
+      "options": [
+        "90°C",
+        "95°C",
+        "100°C",
+        "110°C"
+      ],
+      "answer": "100°C"
+    },
+    {
+      "id": 23,
+      "question": "Who invented the telephone?",
+      "options": [
+        "Thomas Edison",
+        "Alexander Graham Bell",
+        "Nikola Tesla",
+        "James Watt"
+      ],
+      "answer": "Alexander Graham Bell"
+    },
+    {
+      "id": 24,
+      "question": "Which organ in the human body purifies blood?",
+      "options": [
+        "Heart",
+        "Liver",
+        "Kidney",
+        "Lungs"
+      ],
+      "answer": "Kidney"
+    },
+    {
+      "id": 25,
+      "question": "What is the hardest natural substance on Earth?",
+      "options": [
+        "Gold",
+        "Diamond",
+        "Iron",
+        "Platinum"
+      ],
+      "answer": "Diamond"
+    }
+  ]
+}

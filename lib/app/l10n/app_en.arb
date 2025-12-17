@@ -1,0 +1,9 @@
+{
+  "@@locale": "en",
+  "appTitle": "Production App",
+  "home": "Home",
+  "settings": "Settings",
+  "about": "About",
+  "greeting": "Hello, welcome to our app!",
+  "changeLanguage": "Change Language"
+}

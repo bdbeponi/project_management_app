@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<colors>
+ <!-- Primary Colors -->
+    <color name="primaryColor">#FF3B82F6</color>
+    <color name="primaryDark">#FF2563EB</color>
+    <color name="primaryLight">#FF60A5FA</color>
+
+    <!-- Background Colors -->
+    <color name="backgroundColor">#FFFFFFFF</color>
+    <color name="backgroundDark">#FF0F172A</color>
+    <color name="surfaceColor">#FFF8FAFC</color>
+    <color name="surfaceDark">#FF1E293B</color>
+
+    <!-- Text Colors -->
+    <color name="textPrimary">#FF1E293B</color>
+    <color name="textPrimaryDark">#FFF1F5F9</color>
+    <color name="textSecondary">#FF64748B</color>
+    <color name="textSecondaryDark">#FF94A3B8</color>
+    <color name="textHint">#FF94A3B8</color>
+    <color name="textHintDark">#FF64748B</color>
+
+    <!-- Border & Divider Colors -->
+    <color name="borderColor">#FFE2E8F0</color>
+    <color name="borderDark">#FF334155</color>
+    <color name="dividerColor">#FFE2E8F0</color>
+    <color name="dividerDark">#FF334155</color>
+
+    <!-- State Colors -->
+    <color name="successColor">#FF10B981</color>
+    <color name="successLight">#FF34D399</color>
+    <color name="warningColor">#FFF59E0B</color>
+    <color name="warningLight">#FFFBBF24</color>
+    <color name="errorColor">#FFEF4444</color>
+    <color name="errorLight">#FFF87171</color>
+
+    <!-- Card & Container Colors -->
+    <color name="cardColor">#FFFFFFFF</color>
+    <color name="cardDark">#FF1E293B</color>
+    <color name="containerColor">#FFF1F5F9</color>
+    <color name="containerDark">#FF0F172A</color>
+
+    <!-- Input Field Colors -->
+    <color name="inputBackground">#FFFFFFFF</color>
+    <color name="inputBackgroundDark">#FF1E293B</color>
+    <color name="inputBorder">#FFE2E8F0</color>
+    <color name="inputBorderDark">#FF334155</color>
+
+    <!-- Status Colors -->
+    <color name="statusRunning">#FF10B981</color>
+    <color name="statusPending">#FFF59E0B</color>
+    <color name="statusStopped">#FFEF4444</color>
+
+    <!-- Graph & Chart Colors -->
+    <color name="chartPrimary">#FF3B82F6</color>
+    <color name="chartSecondary">#FF10B981</color>
+    <color name="chartTertiary">#FFF59E0B</color>
+    <color name="chartGrid">#FFE2E8F0</color>
+    <color name="chartGridDark">#FF334155</color>
+
+    <!-- Icon Colors -->
+    <color name="iconColor">#FF1E293B</color>
+    <color name="iconDark">#FFF1F5F9</color>
+    <color name="iconSecondary">#FF64748B</color>
+    <color name="iconSecondaryDark">#FF94A3B8</color>
+    <color name="iconActive">#FF3B82F6</color>
+    <color name="iconSuccess">#FF10B981</color>
+    <color name="iconWarning">#FFF59E0B</color>
+    <color name="iconError">#FFEF4444</color>
+
+    <!-- Button Colors -->
+    <color name="buttonPrimary">#FF3B82F6</color>
+    <color name="buttonPrimaryPressed">#FF2563EB</color>
+    <color name="buttonSecondary">#FFF1F5F9</color>
+    <color name="buttonSecondaryDark">#FF334155</color>
+    <color name="buttonText">#FFFFFFFF</color>
+
+    <!-- Tab & Navigation Colors -->
+    <color name="tabSelected">#FF3B82F6</color>
+    <color name="tabUnselected">#FF64748B</color>
+    <color name="tabUnselectedDark">#FF94A3B8</color>
+    <color name="navBackground">#FFFFFFFF</color>
+    <color name="navBackgroundDark">#FF1E293B</color>
+
+    <!-- Shadow & Elevation -->
+    <color name="shadowLight">#1A000000</color>
+    <color name="shadowDark">#1AFFFFFF</color>
+
+    <!-- Disabled States -->
+    <color name="disabledColor">#FFCBD5E1</color>
+    <color name="disabledDark">#FF475569</color>
+</colors>
