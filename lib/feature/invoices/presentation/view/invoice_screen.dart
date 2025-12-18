@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:project_management/app/provider/theme_provider.dart';
 import 'package:project_management/feature/invoices/presentation/view_model/invoice_vm.dart';
+import 'package:project_management/gen/colors.gen.dart';
 import 'package:provider/provider.dart';
 
 class InvoicesScreen extends StatelessWidget {
@@ -34,149 +36,193 @@ class _InvoicesContentState extends State<_InvoicesContent> {
     final provider = Provider.of<InvoiceVm>(context);
     final filteredInvoices = _getFilteredInvoices(provider.invoices);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Invoices',
-          style: TextStyle(fontWeight: FontWeight.w700),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list_rounded),
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              _showFilterSheet(context);
-            },
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProv, _) {
+        return Scaffold(
+          backgroundColor: themeProv.isDarkMode
+              ? AppColors.backgroundDark
+              : AppColors.backgroundColor,
+          appBar: AppBar(
+            backgroundColor: themeProv.isDarkMode
+                ? AppColors.backgroundDark
+                : AppColors.backgroundColor,
+            title: Text(
+              'Invoices',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
+            ),
+            actions: [
+              IconButton(
+                icon: Icon(
+                  Icons.filter_list_rounded,
+                  color: themeProv.isDarkMode
+                      ? AppColors.iconDark
+                      : AppColors.iconColor,
+                ),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  _showFilterSheet(context);
+                },
+              ),
+              const SizedBox(width: 8),
+            ],
           ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          HapticFeedback.mediumImpact();
-          await Future.delayed(const Duration(seconds: 1));
-          // TODO: Refresh invoices from API
-        },
-        child: Column(
-          children: [
-            // Search and Stats Section
-            Container(
-              padding: const EdgeInsets.all(16),
-              color: Theme.of(context).cardColor,
-              child: Column(
-                children: [
-                  // Search Bar
-                  TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search invoice number or client',
-                      prefixIcon: const Icon(Icons.search),
-                      suffixIcon: _searchController.text.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear),
-                              onPressed: () {
-                                setState(() => _searchController.clear());
-                              },
-                            )
-                          : null,
-                      filled: true,
-                      fillColor: Theme.of(context).brightness == Brightness.dark
-                          ? Colors.grey[800]
-                          : Colors.grey[100],
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    onChanged: (value) => setState(() {}),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Stats Cards
-                  Row(
+          body: RefreshIndicator(
+            onRefresh: () async {
+              HapticFeedback.mediumImpact();
+              await Future.delayed(const Duration(seconds: 1));
+              // TODO: Refresh invoices from API
+            },
+            child: Column(
+              children: [
+                // Search and Stats Section
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  color: themeProv.isDarkMode
+                      ? AppColors.backgroundDark
+                      : AppColors.backgroundColor,
+                  child: Column(
                     children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          context,
-                          'Total',
-                          provider.totalInvoices.toString(),
-                          Icons.receipt_long,
-                          Colors.blue,
+                      // Search Bar
+                      TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Search invoice number or client',
+                          hintStyle: TextStyle(
+                            color: themeProv.isDarkMode
+                                ? AppColors.textHint
+                                : AppColors.textHintDark,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: themeProv.isDarkMode
+                                ? AppColors.iconDark
+                                : AppColors.iconColor,
+                          ),
+                          suffixIcon: _searchController.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    setState(() => _searchController.clear());
+                                  },
+                                )
+                              : null,
+                          filled: true,
+                          fillColor: themeProv.isDarkMode
+                              ? AppColors.cardDark
+                              : const Color.fromARGB(255, 242, 242, 242),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
                         ),
+                        onChanged: (value) => setState(() {}),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          context,
-                          'Unpaid',
-                          provider.unpaidCount.toString(),
-                          Icons.schedule,
-                          Colors.orange,
-                        ),
+                      const SizedBox(height: 16),
+
+                      // Stats Cards
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildStatCard(
+                              context,
+                              'Total',
+                              provider.totalInvoices.toString(),
+                              Icons.receipt_long,
+                              Colors.blue,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildStatCard(
+                              context,
+                              'Unpaid',
+                              provider.unpaidCount.toString(),
+                              Icons.schedule,
+                              Colors.orange,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildStatCard(
+                              context,
+                              'Paid',
+                              provider.paidCount.toString(),
+                              Icons.check_circle,
+                              Colors.green,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          context,
-                          'Paid',
-                          provider.paidCount.toString(),
-                          Icons.check_circle,
-                          Colors.green,
+                      const SizedBox(height: 12),
+
+                      // Status Filter Chips
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _buildFilterChip('All', themeProv),
+                            _buildFilterChip('Paid', themeProv),
+                            _buildFilterChip('Unpaid', themeProv),
+                            _buildFilterChip('Overdue', themeProv),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                ),
 
-                  // Status Filter Chips
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        _buildFilterChip('All'),
-                        _buildFilterChip('Paid'),
-                        _buildFilterChip('Unpaid'),
-                        _buildFilterChip('Overdue'),
-                      ],
-                    ),
+                // Invoices List
+                Expanded(
+                  child: filteredInvoices.isEmpty
+                      ? _buildEmptyState()
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(16),
+                          itemCount: filteredInvoices.length,
+                          itemBuilder: (context, index) {
+                            final invoice = filteredInvoices[index];
+                            return _InvoiceCard(invoice: invoice);
+                          },
+                        ),
+                ),
+              ],
+            ),
+          ),
+          floatingActionButton: FloatingActionButton.extended(
+            onPressed: () {
+              HapticFeedback.mediumImpact();
+              // TODO: Navigate to create invoice screen
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Create invoice feature coming soon'),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                ],
+                ),
+              );
+            },
+            icon: Icon(Icons.add, color: AppColors.textPrimaryDark),
+            label: Text(
+              'New Invoice',
+              style: TextStyle(
+                color: AppColors.textPrimaryDark,
+                fontWeight: FontWeight.w700,
               ),
             ),
-
-            // Invoices List
-            Expanded(
-              child: filteredInvoices.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: filteredInvoices.length,
-                      itemBuilder: (context, index) {
-                        final invoice = filteredInvoices[index];
-                        return _InvoiceCard(invoice: invoice);
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          HapticFeedback.mediumImpact();
-          // TODO: Navigate to create invoice screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: const Text('Create invoice feature coming soon'),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-          );
-        },
-        icon: const Icon(Icons.add),
-        label: const Text('New Invoice'),
-      ),
+            backgroundColor: themeProv.isDarkMode
+                ? AppColors.buttonSecondaryDark
+                : AppColors.primaryColor,
+            foregroundColor: themeProv.isDarkMode
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimary,
+          ),
+        );
+      },
     );
   }
 
@@ -219,21 +265,32 @@ class _InvoicesContentState extends State<_InvoicesContent> {
     );
   }
 
-  Widget _buildFilterChip(String label) {
+  Widget _buildFilterChip(String label, ThemeProvider themeProv) {
     final isSelected = _selectedStatus == label;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: FilterChip(
+        backgroundColor: themeProv.isDarkMode
+            ? AppColors.buttonSecondaryDark
+            : AppColors.buttonSecondary,
+        side: BorderSide(
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : Colors.transparent,
+          width: 2,
+        ),
         label: Text(label),
         selected: isSelected,
         onSelected: (selected) {
           HapticFeedback.selectionClick();
           setState(() => _selectedStatus = label);
         },
-        selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+        selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.15),
         checkmarkColor: Theme.of(context).colorScheme.primary,
         labelStyle: TextStyle(
-          color: isSelected ? Theme.of(context).colorScheme.primary : null,
+          color: isSelected
+              ? Theme.of(context).colorScheme.primary
+              : (themeProv.isDarkMode ? Colors.grey[300] : Colors.grey[700]),
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
         ),
       ),
@@ -355,157 +412,193 @@ class _InvoiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: InkWell(
-        onTap: () {
-          HapticFeedback.lightImpact();
-          _showInvoiceDetails(context);
-        },
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProv, _) {
+        return Card(
+          color: themeProv.isDarkMode
+              ? AppColors.cardDark
+              : AppColors.cardColor,
+          margin: const EdgeInsets.only(bottom: 12),
+          child: InkWell(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              _showInvoiceDetails(context);
+            },
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          invoice['invoiceNumber'],
-                          style: const TextStyle(
-                            fontSize: 16,
+                  // Header Row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              invoice['invoiceNumber'],
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: themeProv.isDarkMode
+                                    ? AppColors.textPrimaryDark
+                                    : AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Issued: ${invoice['issueDate']}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: themeProv.isDarkMode
+                                    ? AppColors.textHint
+                                    : AppColors.textHintDark,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.more_vert,
+                          size: 20,
+                          color: themeProv.isDarkMode
+                              ? AppColors.iconDark
+                              : AppColors.iconColor,
+                        ),
+                        onPressed: () {
+                          HapticFeedback.lightImpact();
+                          _showInvoiceMenu(context);
+                        },
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Client Info
+                  Row(
+                    children: [
+                      CircleAvatar(
+                        radius: 20,
+                        backgroundColor: AppColors.primaryColor.withOpacity(
+                          themeProv.isDarkMode ? .3 : .2,
+                        ),
+                        child: Text(
+                          invoice['clientName'].substring(0, 1).toUpperCase(),
+                          style: TextStyle(
+                            color: themeProv.isDarkMode
+                                ? AppColors.primaryColor
+                                : AppColors.primaryDark,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'Issued: ${invoice['issueDate']}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.more_vert, size: 20),
-                    onPressed: () {
-                      HapticFeedback.lightImpact();
-                      _showInvoiceMenu(context);
-                    },
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Client Info
-              Row(
-                children: [
-                  CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.primary.withOpacity(0.2),
-                    child: Text(
-                      invoice['clientName'].substring(0, 1).toUpperCase(),
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.w700,
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Client',
-                          style: TextStyle(fontSize: 11, color: Colors.grey),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          invoice['clientName'],
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Amount and Status
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Amount',
-                        style: TextStyle(fontSize: 11, color: Colors.grey),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        '\$${invoice['amount'].toStringAsFixed(2)}',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Client',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: themeProv.isDarkMode
+                                    ? AppColors.textHint
+                                    : AppColors.textHintDark,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              invoice['clientName'],
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: themeProv.isDarkMode
+                                    ? AppColors.textPrimaryDark
+                                    : AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                  _buildStatusChip(context, invoice['status']),
-                ],
-              ),
+                  const SizedBox(height: 16),
 
-              // Due Date (if unpaid)
-              if (invoice['status'] == 'Unpaid' &&
-                  invoice['dueDate'] != null) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
+                  // Amount and Status
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Icon(
-                        Icons.schedule,
-                        size: 16,
-                        color: Colors.orange,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Amount',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: themeProv.isDarkMode
+                                  ? AppColors.textHint
+                                  : AppColors.textHintDark,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '\$${invoice['amount'].toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                              color: themeProv.isDarkMode
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Due: ${invoice['dueDate']}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.orange,
-                        ),
-                      ),
+                      _buildStatusChip(context, invoice['status']),
                     ],
                   ),
-                ),
-              ],
-            ],
+
+                  // Due Date (if unpaid)
+                  if (invoice['status'] == 'Unpaid' &&
+                      invoice['dueDate'] != null) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.schedule,
+                            size: 16,
+                            color: Colors.orange,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Due: ${invoice['dueDate']}',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.orange,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -559,180 +652,268 @@ class _InvoiceCard extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.75,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        expand: false,
-        builder: (context, scrollController) {
-          return SingleChildScrollView(
-            controller: scrollController,
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Invoice Details',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
+      builder: (context) => Consumer<ThemeProvider>(
+        builder: (context, themeProv, _) {
+          return Container(
+            decoration: BoxDecoration(
+              color: themeProv.isDarkMode
+                  ? AppColors.backgroundDark
+                  : AppColors.backgroundColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+            ),
+            child: DraggableScrollableSheet(
+              initialChildSize: 0.75,
+              minChildSize: 0.5,
+              maxChildSize: 0.95,
+              expand: false,
+              builder: (context, scrollController) {
+                return SingleChildScrollView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: themeProv.isDarkMode
+                                ? Colors.grey[700]
+                                : Colors.grey[300],
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
                       ),
-                    ),
-                    _buildStatusChip(context, invoice['status']),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  invoice['invoiceNumber'],
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                ),
-                const SizedBox(height: 24),
-                _buildDetailRow('Client', invoice['clientName']),
-                _buildDetailRow('Issue Date', invoice['issueDate']),
-                if (invoice['dueDate'] != null)
-                  _buildDetailRow('Due Date', invoice['dueDate']),
-                _buildDetailRow(
-                  'Amount',
-                  '\$${invoice['amount'].toStringAsFixed(2)}',
-                ),
-                _buildDetailRow('Status', invoice['status']),
-                const SizedBox(height: 24),
-                const Text(
-                  'Items',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 16),
-                ...invoice['items'].map<Widget>((item) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Invoice Details',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: themeProv.isDarkMode
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                          _buildStatusChip(context, invoice['status']),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        invoice['invoiceNumber'],
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: themeProv.isDarkMode
+                              ? AppColors.textHint
+                              : AppColors.textHintDark,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      _buildDetailRow(
+                        'Client',
+                        invoice['clientName'],
+                        themeProv,
+                      ),
+                      _buildDetailRow(
+                        'Issue Date',
+                        invoice['issueDate'],
+                        themeProv,
+                      ),
+                      if (invoice['dueDate'] != null)
+                        _buildDetailRow(
+                          'Due Date',
+                          invoice['dueDate'],
+                          themeProv,
+                        ),
+                      _buildDetailRow(
+                        'Amount',
+                        '\$${invoice['amount'].toStringAsFixed(2)}',
+                        themeProv,
+                      ),
+                      _buildDetailRow('Status', invoice['status'], themeProv),
+                      const SizedBox(height: 24),
+                      Text(
+                        'Items',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: themeProv.isDarkMode
+                              ? AppColors.textPrimaryDark
+                              : AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      ...invoice['items'].map<Widget>((item) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                item['description'],
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      item['description'],
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: themeProv.isDarkMode
+                                            ? AppColors.textPrimaryDark
+                                            : AppColors.textPrimary,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${item['quantity']} × \$${item['price']}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: themeProv.isDarkMode
+                                            ? AppColors.textHint
+                                            : AppColors.textHintDark,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               Text(
-                                '${item['quantity']} × \$${item['price']}',
+                                '\$${item['total'].toStringAsFixed(2)}',
                                 style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: themeProv.isDarkMode
+                                      ? AppColors.textPrimaryDark
+                                      : AppColors.textPrimary,
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        Text(
-                          '\$${item['total'].toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                        );
+                      }).toList(),
+                      Divider(
+                        height: 32,
+                        color: themeProv.isDarkMode
+                            ? Colors.grey[700]
+                            : Colors.grey[300],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Total',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: themeProv.isDarkMode
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
+                          Text(
+                            '\$${invoice['amount'].toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                              color: themeProv.isDarkMode
+                                  ? AppColors.primaryColor
+                                  : AppColors.primaryDark,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(
+                                Icons.download,
+                                color: themeProv.isDarkMode
+                                    ? AppColors.iconDark
+                                    : AppColors.iconColor,
+                              ),
+                              label: Text(
+                                'Download',
+                                style: TextStyle(
+                                  color: themeProv.isDarkMode
+                                      ? AppColors.textPrimaryDark
+                                      : AppColors.textPrimary,
+                                ),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: themeProv.isDarkMode
+                                      ? Colors.grey[700]!
+                                      : Colors.grey[300]!,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                HapticFeedback.lightImpact();
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(Icons.share),
+                              label: const Text('Share'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: themeProv.isDarkMode
+                                    ? AppColors.buttonSecondaryDark
+                                    : AppColors.primaryColor,
+                                foregroundColor: AppColors.textPrimaryDark,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (invoice['status'] == 'Unpaid') ...[
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              HapticFeedback.mediumImpact();
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text(
+                                    'Mark as paid feature coming soon',
+                                  ),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.check_circle),
+                            label: const Text('Mark as Paid'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                            ),
                           ),
                         ),
                       ],
-                    ),
-                  );
-                }).toList(),
-                const Divider(height: 32),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'Total',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      '\$${invoice['amount'].toStringAsFixed(2)}',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w700,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          HapticFeedback.lightImpact();
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(Icons.download),
-                        label: const Text('Download'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          HapticFeedback.lightImpact();
-                          Navigator.pop(context);
-                        },
-                        icon: const Icon(Icons.share),
-                        label: const Text('Share'),
-                      ),
-                    ),
-                  ],
-                ),
-                if (invoice['status'] == 'Unpaid') ...[
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        HapticFeedback.mediumImpact();
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text(
-                              'Mark as paid feature coming soon',
-                            ),
-                            behavior: SnackBarBehavior.floating,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.check_circle),
-                      label: const Text('Mark as Paid'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                      ),
-                    ),
+                    ],
                   ),
-                ],
-              ],
+                );
+              },
             ),
           );
         },
@@ -740,16 +921,30 @@ class _InvoiceCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(String label, String value, ThemeProvider themeProv) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              color: themeProv.isDarkMode
+                  ? AppColors.textHint
+                  : AppColors.textHintDark,
+            ),
+          ),
           Text(
             value,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: themeProv.isDarkMode
+                  ? AppColors.textPrimaryDark
+                  : AppColors.textPrimary,
+            ),
           ),
         ],
       ),
