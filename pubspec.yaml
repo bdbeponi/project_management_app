@@ -96,6 +96,8 @@ dev_dependencies:
 
   # 🧪 Developer Tools
   dependency_validator: ^4.1.3
+  # 🔧 Analyzer (ADD THIS TO FIX THE WARNING)
+  analyzer: 
 
 
 

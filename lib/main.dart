@@ -8,7 +8,6 @@ import 'package:project_management/app/provider/register/register_provider.dart'
 import 'package:project_management/app/router/app_router.dart';
 import 'package:project_management/db/service/login/login_local_service.dart';
 import 'package:project_management/db/service/profile/profile_local_service.dart';
-import 'package:project_management/db/service/remember_me/remember_me_service.dart';
 import 'package:project_management/utils/di.dart';
 import 'package:provider/provider.dart';
 
@@ -41,7 +40,6 @@ Future<void> initializeHive() async {
   await Hive.initFlutter(appDocDir.path);
   // await UserProfileService().init();
   await LoginLocalService().init();
-  await RememberMeService().init();
   await ProfileLocalService().init();
 
   // await CurrentPlanLocalService().init();

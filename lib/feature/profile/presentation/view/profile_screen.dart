@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_management/app/provider/theme_provider.dart';
+import 'package:project_management/app/router/config/route_extention.dart';
+import 'package:project_management/db/service/login/login_local_service.dart';
 import 'package:project_management/gen/colors.gen.dart';
 import 'package:provider/provider.dart';
 
@@ -9,7 +11,6 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Consumer<ThemeProvider>(
       builder: (context, themeProv, _) {
         return Scaffold(
@@ -224,14 +225,17 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       Card(
-                        color: themeProv.isDarkMode? AppColors.cardDark:AppColors.cardColor,
+                        color: themeProv.isDarkMode
+                            ? AppColors.cardDark
+                            : AppColors.cardColor,
                         child: SwitchListTile(
                           secondary: Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primary.withOpacity(themeProv.isDarkMode? 0.3:0.1),
+                              color: Theme.of(context).colorScheme.primary
+                                  .withOpacity(
+                                    themeProv.isDarkMode ? 0.3 : 0.1,
+                                  ),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Icon(
@@ -241,9 +245,21 @@ class ProfileScreen extends StatelessWidget {
                               color: Theme.of(context).colorScheme.primary,
                             ),
                           ),
-                          title: Text('Dark Mode',style:TextStyle(color: themeProv.isDarkMode ? AppColors.textPrimaryDark:AppColors.textPrimary,) ),
+                          title: Text(
+                            'Dark Mode',
+                            style: TextStyle(
+                              color: themeProv.isDarkMode
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimary,
+                            ),
+                          ),
                           subtitle: Text(
-                            themeProv.isDarkMode ? 'Enabled' : 'Disabled', style:TextStyle(color: themeProv.isDarkMode ? AppColors.textPrimaryDark:AppColors.textPrimary,) ,
+                            themeProv.isDarkMode ? 'Enabled' : 'Disabled',
+                            style: TextStyle(
+                              color: themeProv.isDarkMode
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimary,
+                            ),
                           ),
                           value: themeProv.isDarkMode,
                           onChanged: (value) {
@@ -304,8 +320,7 @@ class ProfileScreen extends StatelessWidget {
     VoidCallback? onTap,
   }) {
     return Card(
-
-      color: themeProv.isDarkMode ? AppColors.cardDark:AppColors.cardColor,
+      color: themeProv.isDarkMode ? AppColors.cardDark : AppColors.cardColor,
       child: ListTile(
         leading: Container(
           padding: const EdgeInsets.all(8),
@@ -319,14 +334,31 @@ class ProfileScreen extends StatelessWidget {
         ),
         title: Text(
           title,
-          style: TextStyle(fontSize: 12, color: themeProv.isDarkMode ? AppColors.textPrimaryDark:AppColors.textPrimary,),
+          style: TextStyle(
+            fontSize: 12,
+            color: themeProv.isDarkMode
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimary,
+          ),
         ),
         subtitle: Text(
           value,
-          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600,  color: themeProv.isDarkMode ? AppColors.textPrimaryDark:AppColors.textPrimary,),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: themeProv.isDarkMode
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimary,
+          ),
         ),
         trailing: onTap != null
-            ?  Icon(Icons.edit_outlined, size: 20,  color: themeProv.isDarkMode ? AppColors.textPrimaryDark:AppColors.textPrimary,)
+            ? Icon(
+                Icons.edit_outlined,
+                size: 20,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              )
             : null,
         onTap: onTap != null
             ? () {
@@ -393,17 +425,50 @@ class ProfileScreen extends StatelessWidget {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            // onPressed: () {
+            //   HapticFeedback.mediumImpact();
+            //   // final authProvider = Provider.of<AuthProvider>(
+            //   //   context,
+            //   //   listen: false,
+            //   // );
+            //   // authProvider.logout();
+            //   // Navigator.of(context).pushAndRemoveUntil(
+            //   //   MaterialPageRoute(builder: (_) => const LoginScreen()),
+            //   //   (route) => false,
+            //   // );
+
+            // },
+            onPressed: () async {
               HapticFeedback.mediumImpact();
-              // final authProvider = Provider.of<AuthProvider>(
-              //   context,
-              //   listen: false,
-              // );
-              // authProvider.logout();
-              // Navigator.of(context).pushAndRemoveUntil(
-              //   MaterialPageRoute(builder: (_) => const LoginScreen()),
-              //   (route) => false,
-              // );
+
+              // Close the dialog first
+              Navigator.pop(context);
+
+              try {
+                // Option 1: Using Provider
+                // Uncomment if using Provider
+                // final authProvider = Provider.of<AuthProvider>(
+                //   context,
+                //   listen: false,
+                // );
+                // await authProvider.logout();
+
+                // Option 2: Direct service call
+                // If you don't have a provider, use your service directly
+                // await LoginLocalService().clearLoginData();
+                // DioSingleton.instance.clearAuth(); // Clear Dio headers if needed
+                await LoginLocalService().clearLoginData();
+                // Navigate to login screen and clear all previous routes
+                nav.toLogin();
+              } catch (e) {
+                // Show error message if logout fails
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Logout failed: ${e.toString()}'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             child: const Text('Logout'),

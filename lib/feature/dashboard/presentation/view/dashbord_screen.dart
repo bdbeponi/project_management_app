@@ -27,8 +27,8 @@ class _DashboardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<DashbordViewModel, ThemeProvider>(
-      builder: (context, DashbordViewModel, themeProv, _) {
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProv, _) {
         return Scaffold(
           backgroundColor: themeProv.isDarkMode
               ? AppColors.backgroundDark
@@ -127,9 +127,9 @@ class _DashboardContent extends StatelessWidget {
             },
             child: CircleAvatar(
               radius: 18,
-              backgroundColor:  AppColors.primaryColor.withOpacity(
-                          themeProv.isDarkMode ? .3 : .2,
-                        ),
+              backgroundColor: AppColors.primaryColor.withOpacity(
+                themeProv.isDarkMode ? .3 : .2,
+              ),
               child: Text(
                 // authProvider.currentUser?['name']
                 //         ?.substring(0, 1)
@@ -137,8 +137,8 @@ class _DashboardContent extends StatelessWidget {
                 'S',
                 style: TextStyle(
                   color: themeProv.isDarkMode
-                                ? AppColors.primaryColor
-                                : AppColors.primaryDark,
+                      ? AppColors.primaryColor
+                      : AppColors.primaryDark,
                   fontWeight: FontWeight.bold,
                 ),
               ),

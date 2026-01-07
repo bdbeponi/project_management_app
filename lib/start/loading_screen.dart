@@ -35,7 +35,7 @@ class _LoadingState extends State<Loading> {
     if (LoginLocalService().isLoggedIn) {
       DioSingleton.instance.updateAuth(LoginLocalService().accessToken!);
       // nav.toHome(); // Replace with your home screen navigation
-      // nav.toNavigation();
+      nav.toNavigation();
     } else {
       nav.toLogin();
     }

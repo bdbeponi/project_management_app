@@ -19,17 +19,44 @@ class LoginLocalModelAdapter extends TypeAdapter<LoginLocalModel> {
     return LoginLocalModel(
       accessToken: fields[0] as String,
       refreshToken: fields[1] as String,
+      userId: fields[2] as String,
+      userName: fields[3] as String,
+      email: fields[4] as String,
+      userType: fields[5] as String,
+      userCode: fields[6] as String,
+      permissionId: fields[7] as String,
+      image: fields[8] as String?,
+      isActive: fields[9] as bool,
+      fullResponse: fields[10] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, LoginLocalModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.accessToken)
       ..writeByte(1)
-      ..write(obj.refreshToken);
+      ..write(obj.refreshToken)
+      ..writeByte(2)
+      ..write(obj.userId)
+      ..writeByte(3)
+      ..write(obj.userName)
+      ..writeByte(4)
+      ..write(obj.email)
+      ..writeByte(5)
+      ..write(obj.userType)
+      ..writeByte(6)
+      ..write(obj.userCode)
+      ..writeByte(7)
+      ..write(obj.permissionId)
+      ..writeByte(8)
+      ..write(obj.image)
+      ..writeByte(9)
+      ..write(obj.isActive)
+      ..writeByte(10)
+      ..write(obj.fullResponse);
   }
 
   @override
