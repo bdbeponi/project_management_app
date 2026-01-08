@@ -574,7 +574,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:project_management/app/provider/theme_provider.dart';
 import 'package:project_management/feature/project/presentation/view_model/project_edit_vm.dart';
+import 'package:project_management/gen/colors.gen.dart';
 import 'package:project_management/utils/ui_helpers.dart';
 import 'package:provider/provider.dart';
 
@@ -592,39 +594,61 @@ class _EditProjectScreenState extends State<EditProjectScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => EditProjectViewModel()..initialize(widget.project),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Selector<EditProjectViewModel, bool>(
-            selector: (_, vm) => vm.isCreateMode,
-            builder: (_, isCreate, __) =>
-                Text(isCreate ? 'Create Project' : 'Update Project'),
-          ),
-        ),
-        body: SafeArea(
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: const [
-                _DocumentUploadSection(),
-                SizedBox(height: 24),
-                _BasicInformationSection(),
-                SizedBox(height: 24),
-                _SocialMediaSection(),
-                SizedBox(height: 24),
-                _WorkSheetSection(),
-                SizedBox(height: 24),
-                _AssignedBySection(),
-                SizedBox(height: 32),
-                _SubmitButton(),
-                SizedBox(height: 32),
-              ],
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProv, _) {
+        return ChangeNotifierProvider(
+          create: (_) => EditProjectViewModel()..initialize(widget.project),
+          child: Scaffold(
+            backgroundColor: themeProv.isDarkMode
+                ? AppColors.backgroundDark
+                : AppColors.backgroundColor,
+            appBar: AppBar(
+              backgroundColor: themeProv.isDarkMode
+                  ? AppColors.backgroundDark
+                  : AppColors.backgroundColor,
+              iconTheme: IconThemeData(
+                color: themeProv.isDarkMode
+                    ? AppColors.iconDark
+                    : AppColors.iconColor,
+              ),
+              title: Selector<EditProjectViewModel, bool>(
+                selector: (_, vm) => vm.isCreateMode,
+                builder: (_, isCreate, __) => Text(
+                  isCreate ? 'Create Project' : 'Update Project',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: themeProv.isDarkMode
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
+                  ),
+                ),
+              ),
+            ),
+            body: SafeArea(
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: const [
+                    _DocumentUploadSection(),
+                    SizedBox(height: 24),
+                    _BasicInformationSection(),
+                    SizedBox(height: 24),
+                    _SocialMediaSection(),
+                    SizedBox(height: 24),
+                    _WorkSheetSection(),
+                    SizedBox(height: 24),
+                    _AssignedBySection(),
+                    SizedBox(height: 32),
+                    _SubmitButton(),
+                    SizedBox(height: 32),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -664,19 +688,24 @@ class UploadCard extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
 
-  const UploadCard({
-    super.key,
-    required this.title,
-    required this.onTap,
-  });
+  const UploadCard({super.key, required this.title, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    final themeProv = Provider.of<ThemeProvider>(context, listen: false);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            color: themeProv.isDarkMode
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimary,
+          ),
+        ),
         const SizedBox(height: 8),
         InkWell(
           onTap: onTap,
@@ -685,16 +714,35 @@ class UploadCard extends StatelessWidget {
             height: 130,
             width: double.infinity,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
+              color: themeProv.isDarkMode
+                  ? AppColors.cardDark
+                  : AppColors.cardColor,
+              border: Border.all(
+                color: themeProv.isDarkMode
+                    ? AppColors.borderDark
+                    : AppColors.borderColor,
+              ),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Column(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.upload_file, size: 40, color: Colors.grey),
-                SizedBox(height: 12),
-                Text('Tap to upload a file',
-                    style: TextStyle(color: Colors.grey)),
+                Icon(
+                  Icons.upload_file,
+                  size: 40,
+                  color: themeProv.isDarkMode
+                      ? AppColors.iconSecondaryDark
+                      : AppColors.iconSecondary,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Tap to upload a file',
+                  style: TextStyle(
+                    color: themeProv.isDarkMode
+                        ? AppColors.textSecondaryDark
+                        : AppColors.textSecondary,
+                  ),
+                ),
               ],
             ),
           ),
@@ -730,7 +778,7 @@ class _BasicInformationSection extends StatelessWidget {
             'Completed',
             'On Hold',
             'Cancelled',
-            'Stopped'
+            'Stopped',
           ],
           onChanged: (v) => vm.selectedStatus = v!,
         ),
@@ -783,8 +831,7 @@ class _SocialMediaSection extends StatelessWidget {
         UIHelper.verticalSpaceMedium,
         _textField(controller: vm.socialLinkController, label: 'Social Link'),
         UIHelper.verticalSpaceMedium,
-        _textField(
-            controller: vm.socialUsernameController, label: 'User Name'),
+        _textField(controller: vm.socialUsernameController, label: 'User Name'),
         UIHelper.verticalSpaceMedium,
         _textField(
           controller: vm.socialPasswordController,
@@ -824,22 +871,18 @@ class _WorkSheetSection extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: _textField(
-                    controller: sheet['name']!,
-                    label: 'Name',
-                  ),
+                  child: _textField(controller: sheet['name']!, label: 'Name'),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _textField(
-                    controller: sheet['link']!,
-                    label: 'Link',
-                  ),
+                  child: _textField(controller: sheet['link']!, label: 'Link'),
                 ),
                 if (vm.workSheets.length > 1)
                   IconButton(
-                    icon: const Icon(Icons.remove_circle_outline,
-                        color: Colors.red),
+                    icon: const Icon(
+                      Icons.remove_circle_outline,
+                      color: Colors.red,
+                    ),
                     onPressed: () => vm.removeWorkSheet(index),
                   ),
               ],
@@ -902,9 +945,11 @@ class _SubmitButton extends StatelessWidget {
                   Navigator.pop(context, true);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(vm.isCreateMode
-                          ? 'Project created successfully'
-                          : 'Project updated successfully'),
+                      content: Text(
+                        vm.isCreateMode
+                            ? 'Project created successfully'
+                            : 'Project updated successfully',
+                      ),
                       backgroundColor: Colors.green,
                     ),
                   );
@@ -925,14 +970,26 @@ class _SubmitButton extends StatelessWidget {
 /* ----------------------------- HELPERS ----------------------------- */
 
 Widget _sectionHeader(String title, {Widget? action}) {
-  return Row(
-    children: [
-      Text(title,
-          style: const TextStyle(
-              fontSize: 16, fontWeight: FontWeight.w700, color: Colors.red)),
-      const Spacer(),
-      if (action != null) action,
-    ],
+  return Builder(
+    builder: (context) {
+      final themeProv = Provider.of<ThemeProvider>(context, listen: false);
+      return Row(
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: themeProv.isDarkMode
+                  ? AppColors.errorLight
+                  : AppColors.errorColor,
+            ),
+          ),
+          const Spacer(),
+          if (action != null) action,
+        ],
+      );
+    },
   );
 }
 
@@ -943,15 +1000,53 @@ Widget _textField({
   TextInputType? keyboard,
   String? Function(String?)? validator,
 }) {
-  return TextFormField(
-    controller: controller,
-    obscureText: obscure,
-    keyboardType: keyboard,
-    validator: validator,
-    decoration: InputDecoration(
-      labelText: label,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-    ),
+  return Builder(
+    builder: (context) {
+      final themeProv = Provider.of<ThemeProvider>(context, listen: false);
+      return TextFormField(
+        controller: controller,
+        obscureText: obscure,
+        keyboardType: keyboard,
+        validator: validator,
+        style: TextStyle(
+          color: themeProv.isDarkMode
+              ? AppColors.textPrimaryDark
+              : AppColors.textPrimary,
+        ),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            color: themeProv.isDarkMode
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
+          ),
+          filled: true,
+          fillColor: themeProv.isDarkMode
+              ? AppColors.inputBackgroundDark
+              : AppColors.inputBackground,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(
+              color: themeProv.isDarkMode
+                  ? AppColors.inputBorderDark
+                  : AppColors.inputBorder,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(
+              color: themeProv.isDarkMode
+                  ? AppColors.inputBorderDark
+                  : AppColors.inputBorder,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+          ),
+        ),
+      );
+    },
   );
 }
 
@@ -962,16 +1057,70 @@ Widget _dropdown({
   String? Function(String?)? validator,
   required ValueChanged<String?> onChanged,
 }) {
-  return DropdownButtonFormField<String>(
-    value: value,
-    validator: validator,
-    items:
-        items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-    onChanged: onChanged,
-    decoration: InputDecoration(
-      labelText: label,
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-    ),
+  return Builder(
+    builder: (context) {
+      final themeProv = Provider.of<ThemeProvider>(context, listen: false);
+      return DropdownButtonFormField<String>(
+        value: value,
+        validator: validator,
+        dropdownColor: themeProv.isDarkMode
+            ? AppColors.cardDark
+            : AppColors.cardColor,
+        style: TextStyle(
+          color: themeProv.isDarkMode
+              ? AppColors.textPrimaryDark
+              : AppColors.textPrimary,
+        ),
+        items: items
+            .map(
+              (e) => DropdownMenuItem(
+                value: e,
+                child: Text(
+                  e,
+                  style: TextStyle(
+                    color: themeProv.isDarkMode
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
+                  ),
+                ),
+              ),
+            )
+            .toList(),
+        onChanged: onChanged,
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: TextStyle(
+            color: themeProv.isDarkMode
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
+          ),
+          filled: true,
+          fillColor: themeProv.isDarkMode
+              ? AppColors.inputBackgroundDark
+              : AppColors.inputBackground,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(
+              color: themeProv.isDarkMode
+                  ? AppColors.inputBorderDark
+                  : AppColors.inputBorder,
+            ),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(
+              color: themeProv.isDarkMode
+                  ? AppColors.inputBorderDark
+                  : AppColors.inputBorder,
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+          ),
+        ),
+      );
+    },
   );
 }
 
@@ -981,18 +1130,56 @@ Widget _dateField(
   String label,
 ) {
   final vm = context.read<EditProjectViewModel>();
+  final themeProv = Provider.of<ThemeProvider>(context, listen: false);
 
   return TextFormField(
     controller: controller,
     readOnly: true,
     onTap: () => vm.selectDate(context, controller),
+    style: TextStyle(
+      color: themeProv.isDarkMode
+          ? AppColors.textPrimaryDark
+          : AppColors.textPrimary,
+    ),
     decoration: InputDecoration(
       labelText: label,
-      suffixIcon: const Icon(Icons.calendar_today),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+      labelStyle: TextStyle(
+        color: themeProv.isDarkMode
+            ? AppColors.textSecondaryDark
+            : AppColors.textSecondary,
+      ),
+      suffixIcon: Icon(
+        Icons.calendar_today,
+        color: themeProv.isDarkMode
+            ? AppColors.iconSecondaryDark
+            : AppColors.iconSecondary,
+      ),
+      filled: true,
+      fillColor: themeProv.isDarkMode
+          ? AppColors.inputBackgroundDark
+          : AppColors.inputBackground,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(
+          color: themeProv.isDarkMode
+              ? AppColors.inputBorderDark
+              : AppColors.inputBorder,
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(
+          color: themeProv.isDarkMode
+              ? AppColors.inputBorderDark
+              : AppColors.inputBorder,
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: AppColors.primaryColor, width: 2),
+      ),
     ),
   );
 }
 
-String? _required(String? v) =>
-    v == null || v.isEmpty ? 'Required' : null;
+String? _required(String? v) => v == null || v.isEmpty ? 'Required' : null;

@@ -568,8 +568,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:project_management/app/provider/theme_provider.dart';
 import 'package:project_management/app/router/config/route_extention.dart';
 import 'package:project_management/feature/project/presentation/view_model/project_details_vm.dart';
+import 'package:project_management/gen/colors.gen.dart';
 import 'package:project_management/utils/ui_helpers.dart';
 import 'package:provider/provider.dart';
 
@@ -603,144 +605,181 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: _viewModel,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Consumer<ProjectDetailsViewModel>(
-            builder: (context, vm, child) {
-              return Text(
-                vm.projectName.isNotEmpty
-                    ? vm.projectName
-                    : widget.projectName ?? 'Project Details',
-              );
-            },
-          ),
-          actions: [
-            Consumer<ProjectDetailsViewModel>(
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProv, _) {
+        return ChangeNotifierProvider.value(
+          value: _viewModel,
+          child: Scaffold(
+            backgroundColor: themeProv.isDarkMode
+                ? AppColors.backgroundDark
+                : AppColors.backgroundColor,
+            appBar: AppBar(
+              backgroundColor: themeProv.isDarkMode
+                  ? AppColors.backgroundDark
+                  : AppColors.backgroundColor,
+              iconTheme: IconThemeData(
+                color: themeProv.isDarkMode
+                    ? AppColors.iconDark
+                    : AppColors.iconColor,
+              ),
+              title: Consumer<ProjectDetailsViewModel>(
+                builder: (context, vm, child) {
+                  return Text(
+                    vm.projectName.isNotEmpty
+                        ? vm.projectName
+                        : widget.projectName ?? 'Project Details',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: themeProv.isDarkMode
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary,
+                    ),
+                  );
+                },
+              ),
+              actions: [
+                Consumer<ProjectDetailsViewModel>(
+                  builder: (context, vm, child) {
+                    if (vm.isRefreshing) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: themeProv.isDarkMode
+                                ? AppColors.textPrimaryDark
+                                : AppColors.textPrimary,
+                          ),
+                        ),
+                      );
+                    }
+
+                    return IconButton(
+                      icon: Icon(
+                        Icons.refresh,
+                        color: themeProv.isDarkMode
+                            ? AppColors.iconDark
+                            : AppColors.iconColor,
+                      ),
+                      onPressed: vm.isLoading
+                          ? null
+                          : () => vm.refreshProjectDetails(),
+                      tooltip: 'Refresh',
+                    );
+                  },
+                ),
+
+                IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                    size: 24,
+                    color: themeProv.isDarkMode
+                        ? AppColors.iconDark
+                        : AppColors.iconColor,
+                  ),
+                  onPressed: () => nav.toEditProject(),
+                  tooltip: 'Edit',
+                ),
+                UIHelper.horizontalSpaceSmall,
+
+                // PopupMenuButton<String>(
+                //   onSelected: (value) => _handleMenuAction(value),
+                //   itemBuilder: (context) => [
+                //     const PopupMenuItem(
+                //       value: 'edit',
+                //       child: Row(
+                //         children: [
+                //           Icon(Icons.edit, size: 20),
+                //           SizedBox(width: 8),
+                //           Text('Edit Project'),
+                //         ],
+                //       ),
+                //     ),
+                //     const PopupMenuItem(
+                //       value: 'upload',
+                //       child: Row(
+                //         children: [
+                //           Icon(Icons.file_upload, size: 20),
+                //           SizedBox(width: 8),
+                //           Text('Upload Document'),
+                //         ],
+                //       ),
+                //     ),
+                //     const PopupMenuItem(
+                //       value: 'share',
+                //       child: Row(
+                //         children: [
+                //           Icon(Icons.share, size: 20),
+                //           SizedBox(width: 8),
+                //           Text('Share'),
+                //         ],
+                //       ),
+                //     ),
+                //     const PopupMenuItem(
+                //       value: 'archive',
+                //       child: Row(
+                //         children: [
+                //           Icon(Icons.archive, size: 20),
+                //           SizedBox(width: 8),
+                //           Text('Archive'),
+                //         ],
+                //       ),
+                //     ),
+                //     const PopupMenuDivider(),
+                //     const PopupMenuItem(
+                //       value: 'delete',
+                //       child: Row(
+                //         children: [
+                //           Icon(Icons.delete, color: Colors.red, size: 20),
+                //           SizedBox(width: 8),
+                //           Text('Delete', style: TextStyle(color: Colors.red)),
+                //         ],
+                //       ),
+                //     ),
+                //   ],
+                // ),
+              ],
+            ),
+            body: Consumer<ProjectDetailsViewModel>(
               builder: (context, vm, child) {
-                if (vm.isRefreshing) {
-                  return const Padding(
-                    padding: EdgeInsets.all(16),
-                    child: SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                if (vm.isLoading && vm.projectDetails == null) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (vm.hasError && vm.projectDetails == null) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.red,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          vm.errorMessage ?? 'Failed to load project',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => vm.loadProjectDetails(),
+                          child: const Text('Retry'),
+                        ),
+                      ],
                     ),
                   );
                 }
 
-                return IconButton(
-                  icon: const Icon(Icons.refresh),
-                  onPressed: vm.isLoading
-                      ? null
-                      : () => vm.refreshProjectDetails(),
-                  tooltip: 'Refresh',
-                );
+                return _buildContent(context, vm);
               },
             ),
-
-            IconButton(
-              icon: const Icon(Icons.edit, size: 24),
-              onPressed: () => nav.toEditProject(),
-              tooltip: 'Edit',
-            ),
-            UIHelper.horizontalSpaceSmall,
-
-            // PopupMenuButton<String>(
-            //   onSelected: (value) => _handleMenuAction(value),
-            //   itemBuilder: (context) => [
-            //     const PopupMenuItem(
-            //       value: 'edit',
-            //       child: Row(
-            //         children: [
-            //           Icon(Icons.edit, size: 20),
-            //           SizedBox(width: 8),
-            //           Text('Edit Project'),
-            //         ],
-            //       ),
-            //     ),
-            //     const PopupMenuItem(
-            //       value: 'upload',
-            //       child: Row(
-            //         children: [
-            //           Icon(Icons.file_upload, size: 20),
-            //           SizedBox(width: 8),
-            //           Text('Upload Document'),
-            //         ],
-            //       ),
-            //     ),
-            //     const PopupMenuItem(
-            //       value: 'share',
-            //       child: Row(
-            //         children: [
-            //           Icon(Icons.share, size: 20),
-            //           SizedBox(width: 8),
-            //           Text('Share'),
-            //         ],
-            //       ),
-            //     ),
-            //     const PopupMenuItem(
-            //       value: 'archive',
-            //       child: Row(
-            //         children: [
-            //           Icon(Icons.archive, size: 20),
-            //           SizedBox(width: 8),
-            //           Text('Archive'),
-            //         ],
-            //       ),
-            //     ),
-            //     const PopupMenuDivider(),
-            //     const PopupMenuItem(
-            //       value: 'delete',
-            //       child: Row(
-            //         children: [
-            //           Icon(Icons.delete, color: Colors.red, size: 20),
-            //           SizedBox(width: 8),
-            //           Text('Delete', style: TextStyle(color: Colors.red)),
-            //         ],
-            //       ),
-            //     ),
-            //   ],
-            // ),
-          ],
-        ),
-        body: Consumer<ProjectDetailsViewModel>(
-          builder: (context, vm, child) {
-            if (vm.isLoading && vm.projectDetails == null) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (vm.hasError && vm.projectDetails == null) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Colors.red,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      vm.errorMessage ?? 'Failed to load project',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => vm.loadProjectDetails(),
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
-              );
-            }
-
-            return _buildContent(context, vm);
-          },
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -784,7 +823,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   }
 
   Widget _buildProjectHeader(ProjectDetailsViewModel vm) {
+    final themeProv = Provider.of<ThemeProvider>(context, listen: false);
     return Card(
+      color: themeProv.isDarkMode ? AppColors.cardDark : AppColors.cardColor,
       margin: const EdgeInsets.all(16),
       child: Padding(
         padding: const EdgeInsets.all(20),
@@ -805,9 +846,12 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                 Expanded(
                   child: Text(
                     vm.projectName,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
+                      color: themeProv.isDarkMode
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -825,13 +869,21 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                       _buildInfoItem(
                         label: 'Type',
                         value: vm.projectType,
-                        color: Colors.black87,
+                        color: themeProv.isDarkMode
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimary,
+                        themeProv: themeProv,
                       ),
                       const SizedBox(height: 16),
                       _buildInfoItem(
                         label: 'Billing Date',
                         value: vm.billingDate ?? '--',
-                        color: vm.isBillingDue ? Colors.red : Colors.black87,
+                        color: vm.isBillingDue
+                            ? Colors.red
+                            : (themeProv.isDarkMode
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimary),
+                        themeProv: themeProv,
                       ),
                     ],
                   ),
@@ -843,13 +895,19 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                       _buildInfoItem(
                         label: 'Price',
                         value: vm.formatCurrency(vm.price),
-                        color: Colors.black87,
+                        color: themeProv.isDarkMode
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimary,
+                        themeProv: themeProv,
                       ),
                       const SizedBox(height: 16),
                       _buildInfoItem(
                         label: 'Start Date',
                         value: vm.startDate ?? '--',
-                        color: Colors.black87,
+                        color: themeProv.isDarkMode
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimary,
+                        themeProv: themeProv,
                       ),
                     ],
                   ),
@@ -861,13 +919,21 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                       _buildInfoItem(
                         label: 'Cost',
                         value: vm.formatCurrency(vm.cost),
-                        color: Colors.black87,
+                        color: themeProv.isDarkMode
+                            ? AppColors.textPrimaryDark
+                            : AppColors.textPrimary,
+                        themeProv: themeProv,
                       ),
                       const SizedBox(height: 16),
                       _buildInfoItem(
                         label: 'End Date',
                         value: vm.formatDateString(vm.endDate),
-                        color: vm.isOverdue ? Colors.red : Colors.black87,
+                        color: vm.isOverdue
+                            ? Colors.red
+                            : (themeProv.isDarkMode
+                                  ? AppColors.textPrimaryDark
+                                  : AppColors.textPrimary),
+                        themeProv: themeProv,
                       ),
                     ],
                   ),
@@ -941,6 +1007,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     required String label,
     required String value,
     required Color color,
+    required ThemeProvider themeProv,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -949,7 +1016,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
           label,
           style: TextStyle(
             fontSize: 12,
-            color: Colors.grey[600],
+            color: themeProv.isDarkMode
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -967,6 +1036,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   }
 
   Widget _buildDocumentsSection(ProjectDetailsViewModel vm) {
+    final themeProv = Provider.of<ThemeProvider>(context, listen: false);
     final documents = [
       if (vm.agreementUrl?.isNotEmpty == true)
         {'name': 'Agreement', 'url': vm.agreementUrl!},
@@ -976,15 +1046,22 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     if (documents.isEmpty) return const SizedBox();
 
     return Card(
+      color: themeProv.isDarkMode ? AppColors.cardDark : AppColors.cardColor,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Documents',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 20),
             Row(
@@ -1053,19 +1130,32 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Text(
-              name,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Click to view document',
-              style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-              textAlign: TextAlign.center,
+            Consumer<ThemeProvider>(
+              builder: (context, themeProv, _) {
+                return Column(
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Click to view document',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: themeProv.isDarkMode
+                            ? AppColors.textSecondaryDark
+                            : AppColors.textSecondary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),
@@ -1074,16 +1164,24 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   }
 
   Widget _buildSocialAccountsSection(ProjectDetailsViewModel vm) {
+    final themeProv = Provider.of<ThemeProvider>(context, listen: false);
     return Card(
+      color: themeProv.isDarkMode ? AppColors.cardDark : AppColors.cardColor,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Social Accounts',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -1146,6 +1244,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     VoidCallback? onCopy,
     VoidCallback? onOpen,
   }) {
+    final themeProv = Provider.of<ThemeProvider>(context, listen: false);
     final displayValue = value.isEmpty
         ? ''
         : isPassword
@@ -1155,9 +1254,15 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
+        color: themeProv.isDarkMode
+            ? AppColors.inputBackgroundDark
+            : AppColors.inputBackground,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(
+          color: themeProv.isDarkMode
+              ? AppColors.inputBorderDark
+              : AppColors.inputBorder,
+        ),
       ),
       child: Row(
         children: [
@@ -1175,7 +1280,13 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
               displayValue,
               style: TextStyle(
                 fontSize: 14,
-                color: value.isEmpty ? Colors.grey : Colors.grey[600],
+                color: value.isEmpty
+                    ? (themeProv.isDarkMode
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondary)
+                    : (themeProv.isDarkMode
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary),
               ),
             ),
           ),
@@ -1187,7 +1298,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                   icon: Icon(
                     showPassword ? Icons.visibility_off : Icons.visibility,
                     size: 18,
-                    color: Colors.grey[600],
+                    color: themeProv.isDarkMode
+                        ? AppColors.iconSecondaryDark
+                        : AppColors.iconSecondary,
                   ),
                   onPressed: onTogglePassword,
                   padding: EdgeInsets.zero,
@@ -1196,7 +1309,13 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
               if (value.isNotEmpty) ...[
                 const SizedBox(width: 4),
                 IconButton(
-                  icon: Icon(Icons.copy, size: 18, color: Colors.grey[600]),
+                  icon: Icon(
+                    Icons.copy,
+                    size: 18,
+                    color: themeProv.isDarkMode
+                        ? AppColors.iconSecondaryDark
+                        : AppColors.iconSecondary,
+                  ),
                   onPressed: onCopy,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -1208,7 +1327,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                   icon: Icon(
                     Icons.open_in_new,
                     size: 18,
-                    color: Colors.grey[600],
+                    color: themeProv.isDarkMode
+                        ? AppColors.iconSecondaryDark
+                        : AppColors.iconSecondary,
                   ),
                   onPressed: onOpen,
                   padding: EdgeInsets.zero,
@@ -1223,16 +1344,24 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   }
 
   Widget _buildWorkSheetsSection(ProjectDetailsViewModel vm) {
+    final themeProv = Provider.of<ThemeProvider>(context, listen: false);
     return Card(
+      color: themeProv.isDarkMode ? AppColors.cardDark : AppColors.cardColor,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Work Sheets',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 20),
 
@@ -1261,7 +1390,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                               : worksheet.link!,
                           style: TextStyle(
                             fontSize: 14,
-                            color: Colors.grey[600],
+                            color: themeProv.isDarkMode
+                                ? AppColors.textSecondaryDark
+                                : AppColors.textSecondary,
                           ),
                         ),
                         if (worksheet.link?.isNotEmpty == true) ...[
@@ -1290,31 +1421,51 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   }
 
   Widget _buildNotesSection(ProjectDetailsViewModel vm) {
+    final themeProv = Provider.of<ThemeProvider>(context, listen: false);
     return SizedBox(
       width: double.infinity,
       child: Card(
+        color: themeProv.isDarkMode ? AppColors.cardDark : AppColors.cardColor,
         margin: const EdgeInsets.symmetric(horizontal: 16),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Notes',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: themeProv.isDarkMode
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimary,
+                ),
               ),
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.grey[50],
+                  color: themeProv.isDarkMode
+                      ? AppColors.inputBackgroundDark
+                      : AppColors.surfaceColor,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey[300]!),
+                  border: Border.all(
+                    color: themeProv.isDarkMode
+                        ? AppColors.inputBorderDark
+                        : AppColors.inputBorder,
+                  ),
                 ),
                 child: Text(
                   vm.note!,
-                  style: const TextStyle(fontSize: 14, height: 1.5),
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.5,
+                    color: themeProv.isDarkMode
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
+                  ),
                 ),
               ),
             ],
@@ -1324,27 +1475,27 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
     );
   }
 
-  void _handleMenuAction(String action) {
-    HapticFeedback.lightImpact();
+  // void _handleMenuAction(String action) {
+  //   HapticFeedback.lightImpact();
 
-    switch (action) {
-      case 'edit':
-        _editProject();
-        break;
-      case 'upload':
-        _uploadDocument();
-        break;
-      case 'share':
-        _shareProject();
-        break;
-      case 'archive':
-        _archiveProject();
-        break;
-      case 'delete':
-        _deleteProject();
-        break;
-    }
-  }
+  //   switch (action) {
+  //     case 'edit':
+  //       _editProject();
+  //       break;
+  //     case 'upload':
+  //       _uploadDocument();
+  //       break;
+  //     case 'share':
+  //       _shareProject();
+  //       break;
+  //     case 'archive':
+  //       _archiveProject();
+  //       break;
+  //     case 'delete':
+  //       _deleteProject();
+  //       break;
+  //   }
+  // }
 
   Future<void> _copyText(String text) async {
     await Clipboard.setData(ClipboardData(text: text));
