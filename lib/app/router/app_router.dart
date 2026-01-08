@@ -8,6 +8,8 @@ import 'package:project_management/feature/dashboard/presentation/view/dashbord_
 import 'package:project_management/feature/dummy_screens.dart';
 import 'package:project_management/feature/invoices/presentation/view/invoice_screen.dart';
 import 'package:project_management/feature/profile/presentation/view/profile_screen.dart';
+import 'package:project_management/feature/project/presentation/view/project_details.dart';
+import 'package:project_management/feature/project/presentation/view/project_edit_screen.dart';
 import 'package:project_management/feature/project/presentation/view/project_screen.dart';
 import 'package:project_management/start/loading_screen.dart';
 
@@ -25,6 +27,25 @@ class AppRouter {
         GoRoute(
           path: RouteNames.initialLoading,
           builder: (_, _) => const Loading(),
+        ),
+        GoRoute(
+          path: RouteNames.projectDetails,
+          name: RouteNames.projectDetails.name,
+          builder: (_, state) {
+            final data = state.extra as Map;
+            return ProjectDetailsScreen(
+              projectId: data["projectId"] ?? "",
+              projectName: data["projectName"] ?? "",
+            );
+          },
+        ),
+        GoRoute(
+          path: RouteNames.editProject,
+          name: RouteNames.editProject.name,
+          builder: (_, state) {
+            // final data = state.extra as Map;
+            return EditProjectScreen();
+          },
         ),
 
         // // Bottom navigation shell

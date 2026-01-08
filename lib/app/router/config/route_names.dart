@@ -13,7 +13,7 @@ class RouteNames {
 
   static const String dashbord = "/dashbord";
   static const String earnings = "/earnings";
-  static const String projects = "/projects";
+
   static const String invoices = "/invoices";
 
   static const String notification = "/notification";
@@ -29,6 +29,9 @@ class RouteNames {
   //======================
   // Other Routes
   //======================
+  static const String projects = "/projects";
+  static const String projectDetails = "/project_details";
+  static const String editProject = "/edit_project";
 }
 
 extension AppRoutesName on String {

@@ -51,7 +51,7 @@ class _DashboardContent extends StatelessWidget {
       backgroundColor: themeProv.isDarkMode
           ? AppColors.backgroundDark
           : AppColors.backgroundColor,
-      title: Text(
+      title: Text( 
         'Skillers Zone',
         style: TextStyle(
           fontWeight: FontWeight.w700,

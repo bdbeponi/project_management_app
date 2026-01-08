@@ -31,4 +31,27 @@ final class Endpoints {
   ///============================
 
   static String getProjectList() => "/v1/get-project-list";
+  static String getProjectDetails({required String id}) =>
+      "/v1/get-single-project/$id";
+
+  ///============================
+  /// **** Invoices ****
+  ///============================
+
+  // Invoice endpoints
+  static String getInvoiceList() => '/v1/get-invoice-list';
+
+  static String getInvoiceDetails({required String id}) => '/invoices/$id';
+
+  static String createInvoice() => '/invoices';
+
+  static String updateInvoice(String id) => '/invoices/$id';
+
+  static String deleteInvoice(String id) => '/invoices/$id';
+
+  static String updateInvoiceStatus(String id) => '/invoices/$id/status';
+
+  static String downloadInvoice(String id) => '/invoices/$id/download';
+
+  static String sendInvoiceEmail(String id) => '/invoices/$id/send-email';
 }
