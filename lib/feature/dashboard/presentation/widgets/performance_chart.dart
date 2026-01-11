@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter/material.dart';
 import 'package:project_management/app/provider/theme_provider.dart';
 import 'package:project_management/gen/colors.gen.dart';
 import 'package:provider/provider.dart';
@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 class PerformanceChart extends StatelessWidget {
   final List<Map<String, dynamic>> data;
 
-  const PerformanceChart({Key? key, required this.data}) : super(key: key);
+  const PerformanceChart({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {

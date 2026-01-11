@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:project_management/app/provider/theme_provider.dart';
+import 'package:project_management/app/router/config/route_names.dart';
 import 'package:project_management/feature/dashboard/presentation/view_model/dashbord_vm.dart';
 import 'package:project_management/feature/dashboard/presentation/widgets/bar_chart_card.dart';
 import 'package:project_management/feature/dashboard/presentation/widgets/earnings_card.dart';
 import 'package:project_management/feature/dashboard/presentation/widgets/performance_chart.dart';
 import 'package:project_management/feature/dashboard/presentation/widgets/stat_card.dart';
-import 'package:project_management/feature/profile/presentation/view/profile_screen.dart';
 import 'package:project_management/gen/colors.gen.dart';
 import 'package:provider/provider.dart';
 
@@ -48,10 +49,14 @@ class _DashboardContent extends StatelessWidget {
     // final authProvider = Provider.of<AuthProvider>(context);
 
     return AppBar(
+      leading: GestureDetector(
+        onTap: () => Scaffold.of(context).openDrawer(),
+        child: Icon(Icons.menu),
+      ),
       backgroundColor: themeProv.isDarkMode
           ? AppColors.backgroundDark
           : AppColors.backgroundColor,
-      title: Text( 
+      title: Text(
         'Skillers Zone',
         style: TextStyle(
           fontWeight: FontWeight.w700,
@@ -120,10 +125,11 @@ class _DashboardContent extends StatelessWidget {
             onTap: () {
               HapticFeedback.lightImpact();
               // Navigate to profile
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProfileScreen()),
-              );
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              // );
+              context.go(RouteNames.profile);
             },
             child: CircleAvatar(
               radius: 18,

@@ -139,6 +139,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:project_management/app/provider/theme_provider.dart';
+import 'package:project_management/feature/drawer/presentation/view/app_drawer.dart';
+import 'package:project_management/feature/invoices/presentation/view_model/invoice_vm.dart';
+import 'package:project_management/feature/project/presentation/view_model/project_vm.dart';
 import 'package:project_management/gen/colors.gen.dart';
 import 'package:provider/provider.dart';
 
@@ -152,6 +155,17 @@ class NavigationScreen extends StatefulWidget {
 }
 
 class _NavigationScreenState extends State<NavigationScreen> {
+  
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final projectVm = Provider.of<ProjectVm>(context, listen: false);
+      projectVm.loadInitialProjects();
+      context.read<InvoiceVm>().fetchInvoices();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -162,6 +176,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
           currentIndex: widget.shell.currentIndex,
           onTabSelected: (index) => widget.shell.goBranch(index),
         ),
+
+        drawer: DashboardDrawer(),
       ),
     );
   }

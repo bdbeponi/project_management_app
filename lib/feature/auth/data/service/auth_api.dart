@@ -19,8 +19,8 @@ final class AuthApi extends BaseApi {
     return postRequest<LoginResponseModel>(
       endpoint: Endpoints.login(),
       data: {
-        "userEmail": "admin@gmail.com",
-        "userPass": "12345678",
+        "userEmail": email,
+        "userPass": password,
         "rememberMe": true,
       },
       fromJson: LoginResponseModel.fromJson,

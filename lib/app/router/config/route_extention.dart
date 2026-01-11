@@ -25,5 +25,7 @@ extension NavHelpers on NavigationService {
     RouteNames.projectDetails.name,
     extra: {"projectId": projectId, "projectName": projectName},
   );
-    void toEditProject() => pushNamed(RouteNames.editProject.name);
+  void toEditProject() => pushNamed(RouteNames.editProject.name);
+
+  void toClientScreen() => pushNamed(RouteNames.client.name);
 }

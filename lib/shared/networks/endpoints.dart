@@ -1,7 +1,8 @@
 // ignore_for_file: constant_identifier_names
 
-const String url = "https://project.toletpanda.com/api";
-// const String imageUrl = "https://backend.bdbeponi.com/";
+// const String url = "https://project.toletpanda.com/api";
+const String url = "https://backend.woptio.website/api";
+const String imageUrl = "https://backend.woptio.website/";
 
 final class NetworkConstants {
   NetworkConstants._();
@@ -41,17 +42,22 @@ final class Endpoints {
   // Invoice endpoints
   static String getInvoiceList() => '/v1/get-invoice-list';
 
-  static String getInvoiceDetails({required String id}) => '/invoices/$id';
+  // static String getInvoiceDetails({required String id}) => '/invoices/$id';
 
-  static String createInvoice() => '/invoices';
+  // static String createInvoice() => '/invoices';
 
-  static String updateInvoice(String id) => '/invoices/$id';
+  // static String updateInvoice(String id) => '/invoices/$id';
 
-  static String deleteInvoice(String id) => '/invoices/$id';
+  // static String deleteInvoice(String id) => '/invoices/$id';
 
-  static String updateInvoiceStatus(String id) => '/invoices/$id/status';
+  // static String updateInvoiceStatus(String id) => '/invoices/$id/status';
 
-  static String downloadInvoice(String id) => '/invoices/$id/download';
+  // static String downloadInvoice(String id) => '/invoices/$id/download';
 
-  static String sendInvoiceEmail(String id) => '/invoices/$id/send-email';
+  // static String sendInvoiceEmail(String id) => '/invoices/$id/send-email';
+
+  ///============================
+  /// **** Clients ****
+  ///============================
+  static String getClientList() => '/v1/get-user-list';
 }

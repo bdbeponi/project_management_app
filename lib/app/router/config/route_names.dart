@@ -27,11 +27,17 @@ class RouteNames {
   static const String updatePass = "/update_password";
 
   //======================
-  // Other Routes
+  // Projects Routes
   //======================
   static const String projects = "/projects";
   static const String projectDetails = "/project_details";
   static const String editProject = "/edit_project";
+
+  //======================
+  // Client Routes
+  //======================
+
+  static const String client = "/client";
 }
 
 extension AppRoutesName on String {

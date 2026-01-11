@@ -41,7 +41,6 @@ class _ProjectsContentState extends State<_ProjectsContent> {
       final provider = Provider.of<ProjectVm>(context, listen: false);
       provider.loadInitialProjects();
     });
-
     // Add scroll listener for pagination
     _scrollController.addListener(_scrollListener);
   }
@@ -939,7 +938,6 @@ class _ProjectCard extends StatelessWidget {
             onTap: () async {
               HapticFeedback.lightImpact();
               // _showProjectDetails(context, themeProv);
-
 
               nav.toProjectDetails(
                 projectId: project.id,

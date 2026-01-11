@@ -4,6 +4,7 @@ import 'package:project_management/app/router/config/navigation_service.dart';
 import 'package:project_management/app/router/config/route_names.dart';
 import 'package:project_management/app/router/routes/auth_route.dart';
 import 'package:project_management/feature/bottom_nav_bar.dart';
+import 'package:project_management/feature/clients/presentation/view/client_screen.dart';
 import 'package:project_management/feature/dashboard/presentation/view/dashbord_screen.dart';
 import 'package:project_management/feature/dummy_screens.dart';
 import 'package:project_management/feature/invoices/presentation/view/invoice_screen.dart';
@@ -45,6 +46,14 @@ class AppRouter {
           builder: (_, state) {
             // final data = state.extra as Map;
             return EditProjectScreen();
+          },
+        ),
+        GoRoute(
+          path: RouteNames.client,
+          name: RouteNames.client.name,
+          builder: (_, state) {
+            // final data = state.extra as Map;
+            return ClientScreen();
           },
         ),
 

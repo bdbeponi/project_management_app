@@ -1050,9 +1050,9 @@ class _InvoicesContentState extends State<_InvoicesContent> {
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<InvoiceVm>().fetchInvoices();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   context.read<InvoiceVm>().fetchInvoices();
+    // });
   }
 
   @override

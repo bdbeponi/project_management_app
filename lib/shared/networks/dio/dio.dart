@@ -84,9 +84,8 @@
 // );
 
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
-import 'package:project_management/shared/networks/dio/interceptor/dio_logger.dart';
 import 'package:project_management/shared/networks/dio/interceptor/error.dart';
+import 'package:project_management/shared/networks/dio/interceptor/log.dart';
 import 'package:project_management/shared/networks/endpoints.dart';
 import 'package:project_management/shared/networks/exception_handler/data_source.dart';
 
@@ -115,14 +114,15 @@ final class DioSingleton {
 
     dio = Dio(options)
       ..interceptors.addAll([
-        if (kDebugMode) // Only add logger in debug mode
-          CustomDioLogger(
-            level: LogLevel.debug,
-            showTimestamp: true,
-            logPrint: (message) {
-              if (kDebugMode) print(message);
-            },
-          ),
+        // if (kDebugMode) // Only add logger in debug mode
+        //   CustomDioLogger(
+        //     level: LogLevel.debug,
+        //     showTimestamp: true,
+        //     logPrint: (message) {
+        //       if (kDebugMode) print(message);
+        //     },
+        //   ),
+        DioLogger(),
         DioErrors(),
       ]);
   }
