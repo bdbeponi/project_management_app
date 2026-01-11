@@ -325,7 +325,7 @@ class _ProjectsContentState extends State<_ProjectsContent> {
                                         }
 
                                         final project = filteredProjects[index];
-                                        return _ProjectCard(project: project);
+                                        return ProjectCard(project: project);
                                       },
                                     ),
                             ),
@@ -899,10 +899,10 @@ class _AdvancedFilterSheetState extends State<_AdvancedFilterSheet> {
 }
 
 // Keep the _ProjectCard class as it is (from previous code)
-class _ProjectCard extends StatelessWidget {
+class ProjectCard extends StatelessWidget {
   final Item project;
 
-  const _ProjectCard({required this.project});
+  const ProjectCard({super.key, required this.project});
 
   String _formatDate(DateTime? date) {
     if (date == null) return 'N/A';

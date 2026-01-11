@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:project_management/feature/clients/model/client_details_response_model.dart';
 import 'package:project_management/feature/clients/model/client_list_response_model.dart';
 import 'package:project_management/shared/networks/dio/base_api.dart';
 import 'package:project_management/shared/networks/dio/dio.dart';
@@ -42,6 +43,21 @@ final class ClientApi extends BaseApi {
       queryParameters: queryParams,
       fromJson: ClientListResponseModel.fromJson,
       errorMessage: 'Failed to fetch client list.',
+    );
+  }
+
+  /// Get details of a single client by ID
+  Future<ApiResponse<ClientDetailsResponseModel>> getClientDetails({
+    required String? clientId,
+  }) async {
+    final String endpoint = Endpoints.getClientDetails(clientId);
+
+    log('Fetching client details for ID: $clientId');
+
+    return getRequest<ClientDetailsResponseModel>(
+      endpoint: endpoint,
+      fromJson: ClientDetailsResponseModel.fromJson,
+      errorMessage: 'Failed to fetch client details.',
     );
   }
 }

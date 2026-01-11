@@ -84,16 +84,23 @@
 //       );
 
 //       // Check response
-//       if (!response.success || response.data == null) {
+//       if (!response.success) {
 //         throw ProjectFailure(response.message ?? 'Failed to fetch projects');
 //       }
 
-//       final projectData = response.data!;
+//       final projectData = response.data;
+//       if (projectData == null) {
+//         throw ProjectFailure('No data received from server');
+//       }
 
 //       // Update pagination info
 //       if (projectData.data?.meta != null) {
 //         _totalPages = projectData.data!.meta!.lastPage ?? 1;
 //         _totalItems = projectData.data!.meta!.total ?? 0;
+//       } else {
+//         // Default values if meta is null
+//         _totalPages = 1;
+//         _totalItems = projectData.data?.items?.length ?? 0;
 //       }
 
 //       // Cache the results
@@ -139,7 +146,7 @@
 //         );
 //       }
 
-//       // Handle specific errors
+//       // Handle specific errors with proper null safety
 //       return _handleError(e);
 //     }
 //   }
@@ -277,7 +284,6 @@
 //       }
 
 //       // If not found in cache, you could implement a separate API call here
-//       // For now, return null - you might want to add a getProjectById API method
 //       return null;
 //     } catch (e) {
 //       log('Error getting project by ID: $e');
@@ -364,22 +370,34 @@
 //   }
 
 //   GetProjectListResponseModel _handleError(dynamic e) {
-//     final errorMessage = e.toString();
+//     String errorMessage;
 
-//     if (errorMessage.contains('timeout') ||
-//         errorMessage.contains('SocketException')) {
-//       throw ProjectFailure('Connection timeout. Check your internet.');
-//     } else if (errorMessage.contains('401') || errorMessage.contains('403')) {
-//       throw ProjectFailure('Session expired. Please login again.');
-//     } else if (errorMessage.contains('404')) {
-//       throw ProjectFailure('Projects not found.');
-//     } else if (errorMessage.contains('500')) {
-//       throw ProjectFailure('Server error. Try again later.');
-//     } else if (e is ProjectFailure) {
-//       throw e;
+//     if (e is ProjectFailure) {
+//       errorMessage = e.message;
 //     } else {
-//       throw ProjectFailure('Failed to load projects. Please try again.');
+//       final errorString = e.toString();
+
+//       if (errorString.contains('timeout') ||
+//           errorString.contains('SocketException')) {
+//         errorMessage = 'Connection timeout. Check your internet.';
+//       } else if (errorString.contains('401') || errorString.contains('403')) {
+//         errorMessage = 'Session expired. Please login again.';
+//       } else if (errorString.contains('404')) {
+//         errorMessage = 'Projects not found.';
+//       } else if (errorString.contains('500')) {
+//         errorMessage = 'Server error. Try again later.';
+//       } else {
+//         errorMessage = 'Failed to load projects. Please try again.';
+//       }
 //     }
+
+//     // Return error response instead of throwing
+//     return GetProjectListResponseModel(
+//       statusCode: 500,
+//       success: false,
+//       message: errorMessage,
+//       data: null,
+//     );
 //   }
 
 //   /// Get statistics from cached projects
@@ -437,7 +455,7 @@ import 'package:project_management/feature/project/model/get_project_list_respon
 class ProjectRepository {
   final GetProjectListApi _projectApi;
 
-  // Pagination state
+  // Pagination & filter state
   int _currentPage = 1;
   int _totalPages = 1;
   int _totalItems = 0;
@@ -446,6 +464,7 @@ class ProjectRepository {
   String _currentOrderBy = 'desc';
   String? _currentRole;
   String? _currentStatus;
+  String? _currentUserId; // <-- Store userId
 
   // Cache management
   final Map<int, List<Item>> _pageCache = {};
@@ -462,29 +481,33 @@ class ProjectRepository {
     String orderBy = 'desc',
     String? role,
     String? status,
+    String? userId, // <-- Nullable userId param
     bool forceRefresh = false,
   }) async {
     try {
-      // Update current parameters
+      // Update current state
       _currentPage = page;
       _pageSize = pageSize;
       _currentSearch = search;
       _currentOrderBy = orderBy;
       _currentRole = role;
       _currentStatus = status;
+      _currentUserId = userId;
 
-      // Generate cache key for this specific query
       final cacheKey = _generateCacheKey(
         page: page,
         search: search,
         orderBy: orderBy,
         role: role,
         status: status,
+        userId: userId,
       );
 
-      // Check cache first (if not forcing refresh)
+      // Return cached data if available
       if (!forceRefresh && _searchCache.containsKey(cacheKey)) {
-        log('Returning cached data for page $page with search: "$search"');
+        log(
+          'Returning cached data for page $page, search: "$search", userId: "$userId"',
+        );
         return GetProjectListResponseModel(
           statusCode: 200,
           success: true,
@@ -503,8 +526,10 @@ class ProjectRepository {
         );
       }
 
-      // Call API
-      log('Fetching projects from API - Page: $page, Search: "$search"');
+      // API call
+      log(
+        'Fetching projects from API - Page: $page, search: "$search", userId: "$userId"',
+      );
       final response = await _projectApi.getProjectList(
         page: page,
         pageSize: pageSize,
@@ -512,49 +537,39 @@ class ProjectRepository {
         orderBy: orderBy,
         role: role,
         status: status,
+        userId: userId,
       );
 
-      // Check response
       if (!response.success) {
         throw ProjectFailure(response.message ?? 'Failed to fetch projects');
       }
 
       final projectData = response.data;
-      if (projectData == null) {
+      if (projectData == null)
         throw ProjectFailure('No data received from server');
-      }
 
       // Update pagination info
-      if (projectData.data?.meta != null) {
-        _totalPages = projectData.data!.meta!.lastPage ?? 1;
-        _totalItems = projectData.data!.meta!.total ?? 0;
-      } else {
-        // Default values if meta is null
-        _totalPages = 1;
-        _totalItems = projectData.data?.items?.length ?? 0;
-      }
+      _totalPages = projectData.data?.meta?.lastPage ?? 1;
+      _totalItems =
+          projectData.data?.meta?.total ??
+          (projectData.data?.items?.length ?? 0);
 
-      // Cache the results
+      // Cache results
       if (projectData.data?.items != null) {
-        // Cache by page number
         _pageCache[page] = projectData.data!.items!;
-
-        // Cache by search query key
         _searchCache[cacheKey] = projectData.data!.items!;
-
-        // Clean up old cache entries if needed
         _cleanupCache();
       }
 
       return projectData;
     } catch (e) {
-      // Try to return cached data if available
       final cacheKey = _generateCacheKey(
         page: page,
         search: search,
         orderBy: orderBy,
         role: role,
         status: status,
+        userId: userId,
       );
 
       if (_searchCache.containsKey(cacheKey)) {
@@ -577,7 +592,6 @@ class ProjectRepository {
         );
       }
 
-      // Handle specific errors with proper null safety
       return _handleError(e);
     }
   }
@@ -585,7 +599,6 @@ class ProjectRepository {
   /// Load next page
   Future<GetProjectListResponseModel> loadNextPage() async {
     final nextPage = _currentPage + 1;
-
     if (nextPage > _totalPages) {
       return GetProjectListResponseModel(
         statusCode: 400,
@@ -594,7 +607,6 @@ class ProjectRepository {
         data: null,
       );
     }
-
     return getProjects(
       page: nextPage,
       pageSize: _pageSize,
@@ -602,13 +614,13 @@ class ProjectRepository {
       orderBy: _currentOrderBy,
       role: _currentRole,
       status: _currentStatus,
+      userId: _currentUserId,
     );
   }
 
   /// Load previous page
   Future<GetProjectListResponseModel> loadPreviousPage() async {
     final prevPage = _currentPage - 1;
-
     if (prevPage < 1) {
       return GetProjectListResponseModel(
         statusCode: 400,
@@ -617,7 +629,6 @@ class ProjectRepository {
         data: null,
       );
     }
-
     return getProjects(
       page: prevPage,
       pageSize: _pageSize,
@@ -625,6 +636,7 @@ class ProjectRepository {
       orderBy: _currentOrderBy,
       role: _currentRole,
       status: _currentStatus,
+      userId: _currentUserId,
     );
   }
 
@@ -637,30 +649,30 @@ class ProjectRepository {
       orderBy: _currentOrderBy,
       role: _currentRole,
       status: _currentStatus,
+      userId: _currentUserId,
       forceRefresh: true,
     );
   }
 
-  /// Search projects (resets to page 1)
+  /// Search projects
   Future<GetProjectListResponseModel> searchProjects({
     required String query,
     String? role,
     String? status,
   }) async {
-    // Clear search-specific cache when starting new search
     _clearSearchCache();
-
     return getProjects(
       page: 1,
       pageSize: _pageSize,
       search: query,
       orderBy: _currentOrderBy,
-      role: role,
-      status: status,
+      role: role ?? _currentRole,
+      status: status ?? _currentStatus,
+      userId: _currentUserId,
     );
   }
 
-  /// Filter projects by status
+  /// Filter by status
   Future<GetProjectListResponseModel> filterByStatus({
     required String status,
   }) async {
@@ -671,10 +683,11 @@ class ProjectRepository {
       orderBy: _currentOrderBy,
       role: _currentRole,
       status: status,
+      userId: _currentUserId,
     );
   }
 
-  /// Filter projects by role
+  /// Filter by role
   Future<GetProjectListResponseModel> filterByRole({
     required String role,
   }) async {
@@ -685,6 +698,7 @@ class ProjectRepository {
       orderBy: _currentOrderBy,
       role: role,
       status: _currentStatus,
+      userId: _currentUserId,
     );
   }
 
@@ -699,22 +713,18 @@ class ProjectRepository {
       orderBy: orderBy,
       role: _currentRole,
       status: _currentStatus,
+      userId: _currentUserId,
     );
   }
 
   /// Get project by ID
   Future<Item?> getProjectById(String projectId) async {
     try {
-      // Check all cached items first
       for (final items in _searchCache.values) {
         for (final item in items) {
-          if (item.id == projectId) {
-            return item;
-          }
+          if (item.id == projectId) return item;
         }
       }
-
-      // If not found in cache, you could implement a separate API call here
       return null;
     } catch (e) {
       log('Error getting project by ID: $e');
@@ -722,7 +732,7 @@ class ProjectRepository {
     }
   }
 
-  /// Get all cached projects (flattened)
+  /// Get all cached projects
   List<Item> getAllCachedProjects() {
     final allItems = <Item>[];
     for (final items in _searchCache.values) {
@@ -739,8 +749,8 @@ class ProjectRepository {
       orderBy: _currentOrderBy,
       role: _currentRole,
       status: _currentStatus,
+      userId: _currentUserId,
     );
-
     return _searchCache[cacheKey] ?? [];
   }
 
@@ -751,47 +761,45 @@ class ProjectRepository {
     _currentPage = 1;
     _totalPages = 1;
     _totalItems = 0;
+    _currentUserId = null;
   }
 
-  /// Clear only search cache (keep page cache)
-  void _clearSearchCache() {
-    _searchCache.clear();
-  }
+  /// Private helper: clear search cache
+  void _clearSearchCache() => _searchCache.clear();
 
-  /// Get current pagination info
-  Map<String, dynamic> getPaginationInfo() {
-    return {
-      'currentPage': _currentPage,
-      'totalPages': _totalPages,
-      'totalItems': _totalItems,
-      'pageSize': _pageSize,
-      'hasMore': _currentPage < _totalPages,
-    };
-  }
+  /// Get pagination info
+  Map<String, dynamic> getPaginationInfo() => {
+    'currentPage': _currentPage,
+    'totalPages': _totalPages,
+    'totalItems': _totalItems,
+    'pageSize': _pageSize,
+    'hasMore': _currentPage < _totalPages,
+  };
 
-  /// Get current search/filter parameters
-  Map<String, dynamic> getCurrentFilters() {
-    return {
-      'search': _currentSearch,
-      'orderBy': _currentOrderBy,
-      'role': _currentRole,
-      'status': _currentStatus,
-    };
-  }
+  /// Get current filters
+  Map<String, dynamic> getCurrentFilters() => {
+    'search': _currentSearch,
+    'orderBy': _currentOrderBy,
+    'role': _currentRole,
+    'status': _currentStatus,
+    'userId': _currentUserId,
+  };
 
-  // Private helper methods
+  // =====================
+  // Helper Methods
+  // =====================
   String _generateCacheKey({
     required int page,
     required String search,
     required String orderBy,
     String? role,
     String? status,
+    String? userId,
   }) {
-    return '${page}_${search}_${orderBy}_${role ?? ''}_${status ?? ''}';
+    return '${page}_${search}_${orderBy}_${role ?? ''}_${status ?? ''}_${userId ?? ''}';
   }
 
   void _cleanupCache() {
-    // Keep only last 10 search queries in cache
     if (_searchCache.length > 10) {
       final keys = _searchCache.keys.toList();
       for (int i = 0; i < keys.length - 10; i++) {
@@ -807,7 +815,6 @@ class ProjectRepository {
       errorMessage = e.message;
     } else {
       final errorString = e.toString();
-
       if (errorString.contains('timeout') ||
           errorString.contains('SocketException')) {
         errorMessage = 'Connection timeout. Check your internet.';
@@ -822,7 +829,6 @@ class ProjectRepository {
       }
     }
 
-    // Return error response instead of throwing
     return GetProjectListResponseModel(
       statusCode: 500,
       success: false,
@@ -831,7 +837,7 @@ class ProjectRepository {
     );
   }
 
-  /// Get statistics from cached projects
+  /// Statistics from cached projects
   Map<String, int> getProjectStats() {
     final cachedProjects = getAllCachedProjects();
 
@@ -842,16 +848,12 @@ class ProjectRepository {
     int unpaidCount = 0;
 
     for (final project in cachedProjects) {
-      if (project.isActive == true) {
-        activeCount++;
-      }
-
+      if (project.isActive == true) activeCount++;
       if (project.projectType == ProjectType.MONTHLY) {
         monthlyCount++;
       } else if (project.projectType == ProjectType.PROJECT_BASED) {
         projectBasedCount++;
       }
-
       if (project.cPaymentStatus == PaymentStatus.PAID) {
         paidCount++;
       } else if (project.cPaymentStatus == PaymentStatus.UNPAID) {

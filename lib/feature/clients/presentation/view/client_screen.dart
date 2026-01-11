@@ -1,7 +1,9 @@
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_management/feature/clients/model/client_list_response_model.dart';
+import 'package:project_management/feature/clients/presentation/view/client_details.dart';
 import 'package:project_management/feature/clients/presentation/vm/client_vm.dart';
 import 'package:project_management/shared/networks/endpoints.dart';
 import 'package:provider/provider.dart';
@@ -28,40 +30,69 @@ class _ClientsContent extends StatefulWidget {
 class _ClientsContentState extends State<_ClientsContent> {
   final _searchController = TextEditingController();
   String _selectedStatus = 'All';
+  final ScrollController _scrollController = ScrollController();
+  Timer? _debounce; // <<-- add this
 
   @override
   void initState() {
     super.initState();
-    // Fetch clients once the frame is rendered
+
+    // Fetch initial clients
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<ClientsProvider>().fetchClients();
     });
+
+    // Pagination listener
+    _scrollController.addListener(_onScroll);
+    _searchController.addListener(_onSearchChanged);
   }
 
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 100), () {
+      // Call API with the new search query
+      context.read<ClientsProvider>().searchClients(_searchController.text);
+    });
+  }
+
+  // @override
+  // void dispose() {
+  //   _searchController.dispose();
+  //   _scrollController.dispose();
+  //   super.dispose();
+  // }
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _scrollController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
-  List<Item> _filterClients(List<Item> clients) {
-    var filtered = clients;
+  void _onScroll() {
+    final provider = context.read<ClientsProvider>();
 
-    final query = _searchController.text.toLowerCase();
-    if (query.isNotEmpty) {
-      filtered = filtered
-          .where(
-            (c) =>
-                (c.userName ?? '').toLowerCase().contains(query) ||
-                (c.userCode ?? '').toLowerCase().contains(query),
-          )
-          .toList();
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 200 &&
+        provider.hasMore &&
+        !provider.isLoadingMore) {
+      provider.loadMore();
     }
+  }
 
-    // Status filtering commented out for now
-    // if (_selectedStatus != 'All') { ... }
+  List<Item> _filterClients(List<Item> clients) {
+    final query = _searchController.text.toLowerCase();
+    if (query.isEmpty) return clients;
 
-    return filtered;
+    return clients
+        .where(
+          (c) =>
+              (c.userName ?? '').toLowerCase().contains(query) ||
+              (c.userCode ?? '').toLowerCase().contains(query),
+        )
+        .toList();
   }
 
   @override
@@ -71,6 +102,9 @@ class _ClientsContentState extends State<_ClientsContent> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        shadowColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
         title: const Text(
           'Clients',
           style: TextStyle(fontWeight: FontWeight.w700),
@@ -84,6 +118,15 @@ class _ClientsContentState extends State<_ClientsContent> {
       ),
       body: Column(
         children: [
+          // _HeaderSection(
+          //   controller: _searchController,
+          //   selectedStatus: _selectedStatus,
+          //   onStatusChanged: (status) {
+          //     HapticFeedback.selectionClick();
+          //     setState(() => _selectedStatus = status);
+          //   },
+          //   onSearchChanged: (_) => setState(() {}),
+          // ),
           _HeaderSection(
             controller: _searchController,
             selectedStatus: _selectedStatus,
@@ -91,24 +134,49 @@ class _ClientsContentState extends State<_ClientsContent> {
               HapticFeedback.selectionClick();
               setState(() => _selectedStatus = status);
             },
-            onSearchChanged: (_) => setState(() {}),
+            onSearchChanged: (_) {}, // Leave empty, debounce handles API
           ),
+
           Expanded(
-            child: clients.isEmpty
-                ? const _EmptyState()
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: clients.length,
-                    itemBuilder: (_, i) => _ClientCard(client: clients[i]),
-                  ),
+            child: RefreshIndicator(
+              onRefresh: () async {
+                // Clear search text
+                _searchController.clear();
+                // Reset provider and fetch initial data
+                await provider.fetchClients(refresh: true);
+              },
+              child: provider.isLoading && clients.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : clients.isEmpty
+                  ? const _EmptyState()
+                  : ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: clients.length + (provider.hasMore ? 1 : 0),
+                      physics: AlwaysScrollableScrollPhysics(),
+                      itemBuilder: (_, index) {
+                        if (index < clients.length) {
+                          return _ClientCard(client: clients[index]);
+                        } else {
+                          // Show loading indicator at bottom
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+            ),
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => HapticFeedback.mediumImpact(),
-        icon: const Icon(Icons.add),
-        label: const Text('New Client'),
-      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () => HapticFeedback.mediumImpact(),
+      //   icon: const Icon(Icons.add),
+      //   label: const Text('New Client'),
+      // ),
     );
   }
 }
@@ -182,25 +250,25 @@ class _HeaderSection extends StatelessWidget {
             ),
             onChanged: onSearchChanged,
           ),
-          const SizedBox(height: 12),
-          SizedBox(
-            height: 40,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: ['All', 'Active', 'Inactive']
-                  .map(
-                    (e) => Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: FilterChip(
-                        label: Text(e),
-                        selected: selectedStatus == e,
-                        onSelected: (_) => onStatusChanged(e),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
+          // const SizedBox(height: 12),
+          // SizedBox(
+          //   height: 40,
+          //   child: ListView(
+          //     scrollDirection: Axis.horizontal,
+          //     children: ['All', 'Active', 'Inactive']
+          //         .map(
+          //           (e) => Padding(
+          //             padding: const EdgeInsets.only(right: 8),
+          //             child: FilterChip(
+          //               label: Text(e),
+          //               selected: selectedStatus == e,
+          //               onSelected: (_) => onStatusChanged(e),
+          //             ),
+          //           ),
+          //         )
+          //         .toList(),
+          //   ),
+          // ),
         ],
       ),
     );
@@ -219,7 +287,15 @@ class _ClientCard extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        onTap: () => HapticFeedback.lightImpact(),
+        onTap: () {
+          HapticFeedback.lightImpact();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ClientDetailsScreen(clientId: client.id),
+            ),
+          );
+        },
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -290,7 +366,7 @@ class _ClientCard extends StatelessWidget {
                     icon: const Icon(Icons.more_vert, size: 20),
                     onPressed: () {
                       HapticFeedback.lightImpact();
-                      _showClientMenu(context, client);
+                      // _showClientMenu(context, client);
                     },
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),

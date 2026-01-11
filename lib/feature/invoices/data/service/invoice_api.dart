@@ -35,7 +35,7 @@ final class InvoiceApi extends BaseApi {
     }
 
     if (clientId != null && clientId.isNotEmpty) {
-      queryParams['client_id'] = clientId;
+      queryParams['clientId'] = clientId;
     }
 
     if (startDate != null) {

@@ -19,6 +19,7 @@ final class GetProjectListApi extends BaseApi {
     String orderBy = 'desc',
     String? role,
     String? status,
+    required String? userId,
   }) async {
     // Build query parameters
     final Map<String, dynamic> queryParams = {
@@ -35,6 +36,9 @@ final class GetProjectListApi extends BaseApi {
 
     if (status != null && status.isNotEmpty) {
       queryParams['status'] = status;
+    }
+    if (userId != null && userId.isNotEmpty) {
+      queryParams['userId'] = userId;
     }
 
     log("Fetching project list with params: $queryParams");
