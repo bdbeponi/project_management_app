@@ -1089,6 +1089,10 @@ class _InvoicesContentState extends State<_InvoicesContent> {
               ? AppColors.backgroundDark
               : AppColors.backgroundColor,
           appBar: AppBar(
+            leading: GestureDetector(
+              onTap: () => Scaffold.of(context).openDrawer(),
+              child: Icon(Icons.menu),
+            ),
             backgroundColor: themeProv.isDarkMode
                 ? AppColors.backgroundDark
                 : AppColors.backgroundColor,

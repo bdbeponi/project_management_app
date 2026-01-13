@@ -302,6 +302,7 @@ import 'package:flutter/services.dart';
 import 'package:project_management/feature/clients/presentation/view/client_invoice.dart';
 import 'package:project_management/feature/clients/presentation/view/client_projects_invoices.dart';
 import 'package:project_management/feature/clients/presentation/vm/client_details_vm.dart';
+import 'package:project_management/shared/networks/endpoints.dart';
 import 'package:project_management/utils/ui_helpers.dart';
 import 'package:provider/provider.dart';
 
@@ -372,20 +373,28 @@ class ClientDetailsScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.blue.withOpacity(0.1),
-                      child: Text(
-                        client.userName != null
-                            ? client.userName!.substring(0, 1).toUpperCase()
-                            : '',
-                        style: const TextStyle(
-                          fontSize: 40,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
+                    // CircleAvatar(
+                    //   radius: 50,
+                    //   backgroundColor: Colors.blue.withOpacity(0.1),
+                    //   child: Text(
+                    //     client.userName != null
+                    //         ? client.userName!.substring(0, 1).toUpperCase()
+                    //         : '',
+                    //     style: const TextStyle(
+                    //       fontSize: 40,
+                    //       fontWeight: FontWeight.bold,
+                    //       color: Colors.blue,
+                    //     ),
+                    //   ),
+                    // ),
+                    ClipOval(
+                      child: CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.blue.withOpacity(0.1),
+                        child: Image.network("$imageUrl${client.image}"),
                       ),
                     ),
+
                     const SizedBox(height: 16),
                     Text(
                       client.userName ?? 'No Name',

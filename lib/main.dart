@@ -89,10 +89,10 @@ class UtillScreenMobile extends StatelessWidget {
       designSize: const Size(375, 812),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (_, __) {
+      builder: (_, _) {
         return PopScope(
           canPop: false,
-          onPopInvokedWithResult: (_, __) async {
+          onPopInvokedWithResult: (_, _) async {
             // showMaterialDialog(context: context);
           },
           child: MaterialApp.router(

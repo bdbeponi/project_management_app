@@ -8,10 +8,11 @@ final class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: Center(
         child: SizedBox(
-          width: 256.w,
-          child: Image.asset(Assets.images.fullAppIcon.path),
+          width: 160.w,
+          child: Image.asset(Assets.images.appIconSkz.path),
         ),
       ),
     );
