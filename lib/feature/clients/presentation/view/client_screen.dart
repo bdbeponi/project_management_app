@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:project_management/app/provider/theme_provider.dart';
 import 'package:project_management/feature/clients/model/client_list_response_model.dart';
 import 'package:project_management/feature/clients/presentation/view/client_details.dart';
 import 'package:project_management/feature/clients/presentation/vm/client_vm.dart';
+import 'package:project_management/gen/colors.gen.dart';
 import 'package:project_management/shared/networks/endpoints.dart';
 import 'package:provider/provider.dart';
 
@@ -98,34 +100,46 @@ class _ClientsContentState extends State<_ClientsContent> {
   Widget build(BuildContext context) {
     final provider = context.watch<ClientsProvider>();
     final clients = _filterClients(provider.clients);
+    final themeProv = context.watch<ThemeProvider>();
 
     return Scaffold(
+      backgroundColor: themeProv.isDarkMode
+          ? AppColors.backgroundDark
+          : AppColors.backgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: themeProv.isDarkMode
+            ? AppColors.backgroundDark
+            : AppColors.backgroundColor,
         shadowColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
-        title: const Text(
+        iconTheme: IconThemeData(
+          color: themeProv.isDarkMode
+              ? AppColors.iconDark
+              : AppColors.iconColor,
+        ),
+        title: Text(
           'Clients',
-          style: TextStyle(fontWeight: FontWeight.w700),
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: themeProv.isDarkMode
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimary,
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.filter_list_rounded),
-            onPressed: () => _showFilterSheet(context),
+            icon: Icon(
+              Icons.filter_list_rounded,
+              color: themeProv.isDarkMode
+                  ? AppColors.iconDark
+                  : AppColors.iconColor,
+            ),
+            onPressed: () => _showFilterSheet(context, themeProv),
           ),
         ],
       ),
       body: Column(
         children: [
-          // _HeaderSection(
-          //   controller: _searchController,
-          //   selectedStatus: _selectedStatus,
-          //   onStatusChanged: (status) {
-          //     HapticFeedback.selectionClick();
-          //     setState(() => _selectedStatus = status);
-          //   },
-          //   onSearchChanged: (_) => setState(() {}),
-          // ),
           _HeaderSection(
             controller: _searchController,
             selectedStatus: _selectedStatus,
@@ -134,6 +148,7 @@ class _ClientsContentState extends State<_ClientsContent> {
               setState(() => _selectedStatus = status);
             },
             onSearchChanged: (_) {}, // Leave empty, debounce handles API
+            themeProv: themeProv,
           ),
 
           Expanded(
@@ -145,23 +160,33 @@ class _ClientsContentState extends State<_ClientsContent> {
                 await provider.fetchClients(refresh: true);
               },
               child: provider.isLoading && clients.isEmpty
-                  ? const Center(child: CircularProgressIndicator())
+                  ? Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primaryColor,
+                      ),
+                    )
                   : clients.isEmpty
-                  ? const _EmptyState()
+                  ? _EmptyState(themeProv: themeProv)
                   : ListView.builder(
                       controller: _scrollController,
                       padding: const EdgeInsets.all(16),
                       itemCount: clients.length + (provider.hasMore ? 1 : 0),
-                      physics: AlwaysScrollableScrollPhysics(),
+                      physics: const AlwaysScrollableScrollPhysics(),
                       itemBuilder: (_, index) {
                         if (index < clients.length) {
-                          return _ClientCard(client: clients[index]);
+                          return _ClientCard(
+                            client: clients[index],
+                            themeProv: themeProv,
+                          );
                         } else {
                           // Show loading indicator at bottom
-                          return const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 16),
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                             child: Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppColors.primaryColor,
+                              ),
                             ),
                           );
                         }
@@ -180,23 +205,32 @@ class _ClientsContentState extends State<_ClientsContent> {
   }
 }
 
-void _showFilterSheet(BuildContext context) {
+void _showFilterSheet(BuildContext context, ThemeProvider themeProv) {
   showModalBottomSheet(
     context: context,
+    backgroundColor: themeProv.isDarkMode
+        ? AppColors.cardDark
+        : AppColors.cardColor,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
-    builder: (_) => const Padding(
-      padding: EdgeInsets.all(24),
+    builder: (_) => Padding(
+      padding: const EdgeInsets.all(24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Filter Clients',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: themeProv.isDarkMode
+                  ? AppColors.textPrimaryDark
+                  : AppColors.textPrimary,
+            ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           // Filter chips currently commented out
         ],
       ),
@@ -211,29 +245,53 @@ class _HeaderSection extends StatelessWidget {
   final String selectedStatus;
   final ValueChanged<String> onStatusChanged;
   final ValueChanged<String> onSearchChanged;
+  final ThemeProvider themeProv;
 
   const _HeaderSection({
     required this.controller,
     required this.selectedStatus,
     required this.onStatusChanged,
     required this.onSearchChanged,
+    required this.themeProv,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: themeProv.isDarkMode
+          ? AppColors.backgroundDark
+          : AppColors.backgroundColor,
       child: Column(
         children: [
           TextField(
             controller: controller,
+            style: TextStyle(
+              color: themeProv.isDarkMode
+                  ? AppColors.textPrimaryDark
+                  : AppColors.textPrimary,
+            ),
             decoration: InputDecoration(
               hintText: 'Search clients',
-              prefixIcon: const Icon(Icons.search),
+              hintStyle: TextStyle(
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: themeProv.isDarkMode
+                    ? AppColors.iconDark
+                    : AppColors.iconColor,
+              ),
               suffixIcon: controller.text.isNotEmpty
                   ? IconButton(
-                      icon: const Icon(Icons.close),
+                      icon: Icon(
+                        Icons.close,
+                        color: themeProv.isDarkMode
+                            ? AppColors.iconDark
+                            : AppColors.iconColor,
+                      ),
                       onPressed: () {
                         controller.clear();
                         onSearchChanged('');
@@ -241,7 +299,9 @@ class _HeaderSection extends StatelessWidget {
                     )
                   : null,
               filled: true,
-              fillColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              fillColor: themeProv.isDarkMode
+                  ? AppColors.cardDark
+                  : AppColors.buttonSecondary,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(14),
                 borderSide: BorderSide.none,
@@ -249,25 +309,6 @@ class _HeaderSection extends StatelessWidget {
             ),
             onChanged: onSearchChanged,
           ),
-          // const SizedBox(height: 12),
-          // SizedBox(
-          //   height: 40,
-          //   child: ListView(
-          //     scrollDirection: Axis.horizontal,
-          //     children: ['All', 'Active', 'Inactive']
-          //         .map(
-          //           (e) => Padding(
-          //             padding: const EdgeInsets.only(right: 8),
-          //             child: FilterChip(
-          //               label: Text(e),
-          //               selected: selectedStatus == e,
-          //               onSelected: (_) => onStatusChanged(e),
-          //             ),
-          //           ),
-          //         )
-          //         .toList(),
-          //   ),
-          // ),
         ],
       ),
     );
@@ -278,13 +319,22 @@ class _HeaderSection extends StatelessWidget {
 
 class _ClientCard extends StatelessWidget {
   final Item client;
+  final ThemeProvider themeProv;
 
-  const _ClientCard({required this.client});
+  const _ClientCard({required this.client, required this.themeProv});
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
+      color: themeProv.isDarkMode ? AppColors.cardDark : AppColors.cardColor,
+      elevation: themeProv.isDarkMode ? 0 : 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: themeProv.isDarkMode
+            ? BorderSide(color: AppColors.borderDark, width: 1)
+            : BorderSide.none,
+      ),
       child: InkWell(
         onTap: () {
           HapticFeedback.lightImpact();
@@ -306,9 +356,9 @@ class _ClientCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: Theme.of(
-                      context,
-                    ).colorScheme.primary.withOpacity(0.1),
+                    backgroundColor: AppColors.primaryColor.withOpacity(
+                      themeProv.isDarkMode ? 0.3 : 0.1,
+                    ),
                     backgroundImage: client.image != null
                         ? NetworkImage(imageUrl + client.image!)
                         : null,
@@ -319,7 +369,9 @@ class _ClientCard extends StatelessWidget {
                                 .toUpperCase(),
                             style: TextStyle(
                               fontSize: 24,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: themeProv.isDarkMode
+                                  ? AppColors.primaryLight
+                                  : AppColors.primaryColor,
                               fontWeight: FontWeight.bold,
                             ),
                           )
@@ -332,9 +384,12 @@ class _ClientCard extends StatelessWidget {
                       children: [
                         Text(
                           client.userName ?? "N/A",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
+                            color: themeProv.isDarkMode
+                                ? AppColors.textPrimaryDark
+                                : AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -344,9 +399,9 @@ class _ClientCard extends StatelessWidget {
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.primary.withOpacity(0.1),
+                            color: AppColors.primaryColor.withOpacity(
+                              themeProv.isDarkMode ? 0.3 : 0.1,
+                            ),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
@@ -354,7 +409,9 @@ class _ClientCard extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
-                              color: Theme.of(context).colorScheme.primary,
+                              color: themeProv.isDarkMode
+                                  ? AppColors.primaryLight
+                                  : AppColors.primaryColor,
                             ),
                           ),
                         ),
@@ -362,7 +419,13 @@ class _ClientCard extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.more_vert, size: 20),
+                    icon: Icon(
+                      Icons.more_vert,
+                      size: 20,
+                      color: themeProv.isDarkMode
+                          ? AppColors.iconDark
+                          : AppColors.iconColor,
+                    ),
                     onPressed: () {
                       HapticFeedback.lightImpact();
                       // _showClientMenu(context, client);
@@ -414,14 +477,18 @@ class _ClientCard extends StatelessWidget {
                     Icon(
                       Icons.business_outlined,
                       size: 16,
-                      color: Colors.grey[600],
+                      color: themeProv.isDarkMode
+                          ? AppColors.textSecondaryDark
+                          : AppColors.textSecondary,
                     ),
                     const SizedBox(width: 6),
                     Text(
                       client.address?.first.name ?? "",
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.grey[600],
+                        color: themeProv.isDarkMode
+                            ? AppColors.textSecondaryDark
+                            : AppColors.textSecondary,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -443,7 +510,13 @@ class _ClientCard extends StatelessWidget {
   }) {
     return Row(
       children: [
-        Icon(icon, size: 14, color: Colors.grey[600]),
+        Icon(
+          icon,
+          size: 14,
+          color: themeProv.isDarkMode
+              ? AppColors.iconSecondaryDark
+              : AppColors.iconSecondary,
+        ),
         const SizedBox(width: 6),
         Expanded(
           child: Column(
@@ -451,13 +524,21 @@ class _ClientCard extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: TextStyle(fontSize: 10, color: Colors.grey[600]),
+                style: TextStyle(
+                  fontSize: 10,
+                  color: themeProv.isDarkMode
+                      ? AppColors.textHint
+                      : AppColors.textHintDark,
+                ),
               ),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
+                  color: themeProv.isDarkMode
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimary,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -469,8 +550,12 @@ class _ClientCard extends StatelessWidget {
   }
 
   void _showClientMenu(BuildContext context, Item client) {
+    final themeProv = context.read<ThemeProvider>();
     showModalBottomSheet(
       context: context,
+      backgroundColor: themeProv.isDarkMode
+          ? AppColors.cardDark
+          : AppColors.cardColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -479,34 +564,66 @@ class _ClientCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              leading: const Icon(Icons.visibility),
-              title: const Text('View Details'),
+              leading: Icon(
+                Icons.visibility,
+                color: themeProv.isDarkMode
+                    ? AppColors.iconDark
+                    : AppColors.iconColor,
+              ),
+              title: Text(
+                'View Details',
+                style: TextStyle(
+                  color: themeProv.isDarkMode
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimary,
+                ),
+              ),
               onTap: () => Navigator.pop(context),
             ),
             ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Edit Client'),
+              leading: Icon(
+                Icons.edit,
+                color: themeProv.isDarkMode
+                    ? AppColors.iconDark
+                    : AppColors.iconColor,
+              ),
+              title: Text(
+                'Edit Client',
+                style: TextStyle(
+                  color: themeProv.isDarkMode
+                      ? AppColors.textPrimaryDark
+                      : AppColors.textPrimary,
+                ),
+              ),
               onTap: () => Navigator.pop(context),
             ),
             ListTile(
               leading: Icon(
                 client.isActive == true ? Icons.block : Icons.check_circle,
-                color: client.isActive == true ? Colors.orange : Colors.green,
+                color: client.isActive == true
+                    ? AppColors.warningColor
+                    : AppColors.successColor,
               ),
               title: Text(
                 client.isActive == true ? 'Deactivate' : 'Activate',
                 style: TextStyle(
-                  color: client.isActive == true ? Colors.orange : Colors.green,
+                  color: client.isActive == true
+                      ? AppColors.warningColor
+                      : AppColors.successColor,
                 ),
               ),
               onTap: () => Navigator.pop(context),
             ),
-            const Divider(),
+            Divider(
+              color: themeProv.isDarkMode
+                  ? AppColors.dividerDark
+                  : AppColors.dividerColor,
+            ),
             ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text(
+              leading: Icon(Icons.delete, color: AppColors.errorColor),
+              title: Text(
                 'Delete Client',
-                style: TextStyle(color: Colors.red),
+                style: TextStyle(color: AppColors.errorColor),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -520,17 +637,40 @@ class _ClientCard extends StatelessWidget {
   }
 
   void _showDeleteConfirmation(BuildContext context, Item client) {
+    final themeProv = context.read<ThemeProvider>();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Client'),
+        backgroundColor: themeProv.isDarkMode
+            ? AppColors.cardDark
+            : AppColors.cardColor,
+        title: Text(
+          'Delete Client',
+          style: TextStyle(
+            color: themeProv.isDarkMode
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimary,
+          ),
+        ),
         content: Text(
           'Are you sure you want to delete ${client.userName}? This action cannot be undone.',
+          style: TextStyle(
+            color: themeProv.isDarkMode
+                ? AppColors.textSecondaryDark
+                : AppColors.textSecondary,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: themeProv.isDarkMode
+                    ? AppColors.textSecondaryDark
+                    : AppColors.textSecondary,
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -546,7 +686,9 @@ class _ClientCard extends StatelessWidget {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.errorColor,
+            ),
             child: const Text('Delete'),
           ),
         ],
@@ -558,7 +700,9 @@ class _ClientCard extends StatelessWidget {
 /* ========================== EMPTY STATE ========================== */
 
 class _EmptyState extends StatelessWidget {
-  const _EmptyState();
+  final ThemeProvider themeProv;
+
+  const _EmptyState({required this.themeProv});
 
   @override
   Widget build(BuildContext context) {
@@ -566,20 +710,32 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.people_outline, size: 80, color: Colors.grey[400]),
+          Icon(
+            Icons.people_outline,
+            size: 80,
+            color: themeProv.isDarkMode
+                ? AppColors.iconSecondaryDark
+                : AppColors.iconSecondary,
+          ),
           const SizedBox(height: 16),
           Text(
             'No clients found',
             style: TextStyle(
               fontSize: 18,
-              color: Colors.grey[600],
+              color: themeProv.isDarkMode
+                  ? AppColors.textPrimaryDark
+                  : AppColors.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 6),
           Text(
             'Try adjusting your search or filters',
-            style: TextStyle(color: Colors.grey[500]),
+            style: TextStyle(
+              color: themeProv.isDarkMode
+                  ? AppColors.textSecondaryDark
+                  : AppColors.textSecondary,
+            ),
           ),
         ],
       ),

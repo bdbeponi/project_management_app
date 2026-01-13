@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:project_management/app/provider/theme_provider.dart';
 import 'package:project_management/app/router/config/route_extention.dart';
 import 'package:project_management/app/router/config/route_names.dart';
 import 'package:project_management/db/service/login/login_local_service.dart';
+import 'package:project_management/gen/colors.gen.dart';
 import 'package:project_management/shared/networks/endpoints.dart';
+import 'package:provider/provider.dart';
 
 class DashboardDrawer extends StatelessWidget {
   const DashboardDrawer({super.key});
@@ -12,204 +15,237 @@ class DashboardDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final auth = LoginLocalService();
+    // Get the current route location
+    final currentRoute = GoRouterState.of(context).uri.path;
 
-    return Drawer(
-      child: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF1a1a1a), Color(0xFF000000)],
-          ),
-        ),
-        child: Column(
-          children: [
-            // Header with Logo
-            Container(
-              padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
-              decoration: const BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Color(0xFF2a2a2a), width: 1),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 45,
-                    height: 45,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProv, _) {
+        return Drawer(
+          child: Container(
+            color: themeProv.isDarkMode
+                ? AppColors.backgroundDark
+                : AppColors.backgroundColor,
+            child: Column(
+              children: [
+                // Header with Logo
+                Container(
+                  padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: themeProv.isDarkMode
+                            ? AppColors.dividerDark
+                            : AppColors.dividerColor,
+                        width: 1,
                       ),
-                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Center(
-                      child: Text(
-                        'W',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 45,
+                        height: 45,
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryColor,
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Woptio',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Menu Items
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 20,
-                ),
-                children: [
-                  DrawerMenuItem(
-                    icon: Icons.dashboard_rounded,
-                    title: 'Dashboard',
-                    isActive: true,
-                    onTap: () {
-                      context.go(RouteNames.dashbord);
-                      nav.goBack();
-                    },
-                  ),
-                  DrawerMenuItem(
-                    icon: Icons.people_rounded,
-                    title: 'Clients',
-                    onTap: () {
-                      nav.toClientScreen();
-                      nav.goBack();
-                    },
-                  ),
-                  DrawerMenuItem(
-                    icon: Icons.folder_rounded,
-                    title: 'Projects',
-                    onTap: () {
-                      context.go(RouteNames.projects);
-                      nav.goBack();
-                    },
-                  ),
-                  DrawerMenuItem(
-                    icon: Icons.description_rounded,
-                    title: 'Invoices',
-                    onTap: () {
-                      context.go(RouteNames.invoices);
-                      nav.goBack();
-                    },
-                  ),
-                  DrawerMenuItem(
-                    icon: Icons.bar_chart_rounded,
-                    title: 'Reports',
-                    onTap: () {},
-                  ),
-                  DrawerMenuItem(
-                    icon: Icons.payment_rounded,
-                    title: 'Payments',
-                    onTap: () {},
-                  ),
-                  DrawerMenuItem(
-                    icon: Icons.group_rounded,
-                    title: 'Employees',
-                    onTap: () {},
-                  ),
-                  DrawerMenuItem(
-                    icon: Icons.settings_rounded,
-                    title: 'Settings',
-                    onTap: () {},
-                  ),
-                ],
-              ),
-            ),
-
-            // User Profile Section
-            auth.isLoggedIn
-                ? Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        top: BorderSide(color: Color(0xFF2a2a2a), width: 1),
-                      ),
-                    ),
-                    child: Row(
-                      children: [
-                        auth.image == null
-                            ? Container(
-                                height: 40.h,
-                                width: 40.w,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Colors.white70,
-                                ),
-                                child: Center(
-                                  child: const Text(
-                                    'JD',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : ClipOval(
-                                child: Image.network(
-                                  imageUrl + (auth.image!),
-                                  height: 40.h,
-                                  width: 40.w,
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                auth.userName ?? 'John Doe',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Text(
-                                auth.email ?? 'admin@woptio.com',
-                                style: TextStyle(
-                                  color: Color(0xFF9CA3AF),
-                                  fontSize: 12,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ],
+                        child: const Center(
+                          child: Text(
+                            'W',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.logout_rounded),
-                          color: const Color(0xFF9CA3AF),
-                          onPressed: () async {
-                            await LoginLocalService().clearLoginData();
-
-                            nav.toLogin();
-                          },
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Woptio',
+                        style: TextStyle(
+                          color: themeProv.isDarkMode
+                              ? AppColors.textPrimaryDark
+                              : AppColors.textPrimary,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Menu Items
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 20,
                     ),
-                  )
-                : SizedBox(),
-          ],
-        ),
-      ),
+                    children: [
+                      DrawerMenuItem(
+                        icon: Icons.dashboard_rounded,
+                        title: 'Dashboard',
+                        isActive: currentRoute == RouteNames.dashbord,
+                        isDarkMode: themeProv.isDarkMode,
+                        onTap: () {
+                          context.go(RouteNames.dashbord);
+                          nav.goBack();
+                        },
+                      ),
+                      DrawerMenuItem(
+                        icon: Icons.people_rounded,
+                        title: 'Clients',
+                        isActive: currentRoute == RouteNames.client,
+                        isDarkMode: themeProv.isDarkMode,
+                        onTap: () {
+                          nav.toClientScreen();
+                          nav.goBack();
+                        },
+                      ),
+                      DrawerMenuItem(
+                        icon: Icons.folder_rounded,
+                        title: 'Projects',
+                        isActive: currentRoute == RouteNames.projects,
+                        isDarkMode: themeProv.isDarkMode,
+                        onTap: () {
+                          context.go(RouteNames.projects);
+                          nav.goBack();
+                        },
+                      ),
+                      DrawerMenuItem(
+                        icon: Icons.description_rounded,
+                        title: 'Invoices',
+                        isActive: currentRoute == RouteNames.invoices,
+                        isDarkMode: themeProv.isDarkMode,
+                        onTap: () {
+                          context.go(RouteNames.invoices);
+                          nav.goBack();
+                        },
+                      ),
+                      DrawerMenuItem(
+                        icon: Icons.bar_chart_rounded,
+                        title: 'Reports',
+                        isDarkMode: themeProv.isDarkMode,
+                        onTap: () {},
+                      ),
+                      DrawerMenuItem(
+                        icon: Icons.payment_rounded,
+                        title: 'Payments',
+                        isDarkMode: themeProv.isDarkMode,
+                        onTap: () {},
+                      ),
+                      DrawerMenuItem(
+                        icon: Icons.group_rounded,
+                        title: 'Employees',
+                        isDarkMode: themeProv.isDarkMode,
+                        onTap: () {},
+                      ),
+                      DrawerMenuItem(
+                        icon: Icons.settings_rounded,
+                        title: 'Settings',
+                        isDarkMode: themeProv.isDarkMode,
+                        onTap: () {},
+                      ),
+                    ],
+                  ),
+                ),
+
+                // User Profile Section
+                auth.isLoggedIn
+                    ? Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          border: Border(
+                            top: BorderSide(
+                              color: themeProv.isDarkMode
+                                  ? AppColors.dividerDark
+                                  : AppColors.dividerColor,
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            auth.image == null
+                                ? Container(
+                                    height: 40.h,
+                                    width: 40.w,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: AppColors.primaryColor.withOpacity(
+                                        themeProv.isDarkMode ? 0.3 : 0.2,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'JD',
+                                        style: TextStyle(
+                                          color: themeProv.isDarkMode
+                                              ? AppColors.primaryColor
+                                              : AppColors.primaryDark,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : ClipOval(
+                                    child: Image.network(
+                                      imageUrl + (auth.image!),
+                                      height: 40.h,
+                                      width: 40.w,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    auth.userName ?? 'John Doe',
+                                    style: TextStyle(
+                                      color: themeProv.isDarkMode
+                                          ? AppColors.textPrimaryDark
+                                          : AppColors.textPrimary,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  Text(
+                                    auth.email ?? 'admin@woptio.com',
+                                    style: TextStyle(
+                                      color: themeProv.isDarkMode
+                                          ? AppColors.textSecondaryDark
+                                          : AppColors.textSecondary,
+                                      fontSize: 12,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.logout_rounded),
+                              color: themeProv.isDarkMode
+                                  ? AppColors.iconError
+                                  : AppColors.iconSecondary,
+                              onPressed: () async {
+                                await LoginLocalService().clearLoginData();
+
+                                nav.toLogin();
+                              },
+                            ),
+                          ],
+                        ),
+                      )
+                    : SizedBox(),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
@@ -218,6 +254,7 @@ class DrawerMenuItem extends StatelessWidget {
   final IconData icon;
   final String title;
   final bool isActive;
+  final bool isDarkMode;
   final VoidCallback onTap;
 
   const DrawerMenuItem({
@@ -225,6 +262,7 @@ class DrawerMenuItem extends StatelessWidget {
     required this.icon,
     required this.title,
     this.isActive = false,
+    this.isDarkMode = false,
     required this.onTap,
   });
 
@@ -233,16 +271,12 @@ class DrawerMenuItem extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
       decoration: BoxDecoration(
-        gradient: isActive
-            ? const LinearGradient(
-                colors: [Color(0xFF8B5CF6), Color(0xFF7C3AED)],
-              )
-            : null,
+        color: isActive ? AppColors.primaryColor : Colors.transparent,
         borderRadius: BorderRadius.circular(10),
         boxShadow: isActive
             ? [
                 BoxShadow(
-                  color: const Color(0xFF8B5CF6).withOpacity(0.5),
+                  color: AppColors.primaryColor.withOpacity(0.3),
                   blurRadius: 15,
                   offset: const Offset(0, 4),
                 ),
@@ -260,14 +294,22 @@ class DrawerMenuItem extends StatelessWidget {
               children: [
                 Icon(
                   icon,
-                  color: isActive ? Colors.white : const Color(0xFF9CA3AF),
+                  color: isActive
+                      ? Colors.white
+                      : (isDarkMode
+                            ? AppColors.iconSecondaryDark
+                            : AppColors.iconSecondary),
                   size: 22,
                 ),
                 const SizedBox(width: 14),
                 Text(
                   title,
                   style: TextStyle(
-                    color: isActive ? Colors.white : const Color(0xFF9CA3AF),
+                    color: isActive
+                        ? Colors.white
+                        : (isDarkMode
+                              ? AppColors.textSecondaryDark
+                              : AppColors.textSecondary),
                     fontSize: 15,
                     fontWeight: FontWeight.w500,
                   ),

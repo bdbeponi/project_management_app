@@ -104,7 +104,12 @@ class _ProjectsContentState extends State<_ProjectsContent> {
               appBar: AppBar(
                 leading: GestureDetector(
                   onTap: () => Scaffold.of(context).openDrawer(),
-                  child: Icon(Icons.menu),
+                  child: Icon(
+                    Icons.menu,
+                    color: themeProv.isDarkMode
+                        ? AppColors.iconDark
+                        : AppColors.iconColor,
+                  ),
                 ),
                 backgroundColor: themeProv.isDarkMode
                     ? AppColors.backgroundDark
