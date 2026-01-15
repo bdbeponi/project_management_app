@@ -68,8 +68,12 @@ class AuthViewModel extends BaseViewModel {
     : _authRepository = authRepository ?? AuthRepository();
 
   // ------------------------- FORM CONTROLLERS -------------------------
-  final emailController = TextEditingController(text: "imran130721@gmail.com");
-  final passwordController = TextEditingController(text: "Imran@123#");
+  final emailController = TextEditingController(
+    text: "sohely.sultana@gmail.com",
+  );
+  final passwordController = TextEditingController(
+    text: "sohely.sultana@gmail.com",
+  );
 
   // ------------------------- UI STATE -------------------------
   bool _obscurePassword = true;

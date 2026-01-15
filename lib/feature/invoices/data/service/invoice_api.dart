@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:project_management/db/service/login/login_local_service.dart';
 import 'package:project_management/feature/invoices/model/invoice_list_response_model.dart';
 import 'package:project_management/shared/networks/dio/base_api.dart';
 import 'package:project_management/shared/networks/dio/dio.dart';
@@ -17,7 +18,7 @@ final class InvoiceApi extends BaseApi {
     String search = '',
     String orderBy = 'desc',
     String? status,
-    String? clientId,
+    // String clientId =,
     DateTime? startDate,
     DateTime? endDate,
   }) async {
@@ -34,8 +35,8 @@ final class InvoiceApi extends BaseApi {
       queryParams['status'] = status;
     }
 
-    if (clientId != null && clientId.isNotEmpty) {
-      queryParams['clientId'] = clientId;
+    if (true) {
+      queryParams['clientId'] = LoginLocalService().userId;
     }
 
     if (startDate != null) {

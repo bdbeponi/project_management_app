@@ -546,7 +546,7 @@ class InvoiceRepository {
         search: search,
         orderBy: orderBy,
         status: status,
-        clientId: clientId,
+        // clientId: clientId,
         startDate: startDate,
         endDate: endDate,
       );

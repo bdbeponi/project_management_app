@@ -61,4 +61,10 @@ final class Endpoints {
   ///============================
   static String getClientList() => '/v1/get-user-list';
   static String getClientDetails(String? id) => '/v1/get-user-by-id/$id';
+
+  ///============================
+  /// **** Profile ****
+  ///============================
+
+  static String getUserProfile(String? id) => '/v1/get-user-by-id/$id';
 }

@@ -5,8 +5,10 @@ import 'package:project_management/app/provider/theme_provider.dart';
 import 'package:project_management/app/router/config/route_extention.dart';
 import 'package:project_management/app/router/config/route_names.dart';
 import 'package:project_management/db/service/login/login_local_service.dart';
+import 'package:project_management/gen/assets.gen.dart';
 import 'package:project_management/gen/colors.gen.dart';
 import 'package:project_management/shared/networks/endpoints.dart';
+import 'package:project_management/utils/ui_helpers.dart';
 import 'package:provider/provider.dart';
 
 class DashboardDrawer extends StatelessWidget {
@@ -27,6 +29,7 @@ class DashboardDrawer extends StatelessWidget {
                 : AppColors.backgroundColor,
             child: Column(
               children: [
+                UIHelper.verticalSpaceSmall,
                 // Header with Logo
                 Container(
                   padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
@@ -42,27 +45,21 @@ class DashboardDrawer extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Container(
+                      SizedBox(
                         width: 45,
                         height: 45,
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryColor,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Center(
-                          child: Text(
-                            'W',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                        // decoration: BoxDecoration(
+                        //   color: AppColors.primaryColor,
+                        //   borderRadius: BorderRadius.circular(10),
+                        // ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.r),
+                          child: Image.asset(Assets.images.skzClientInApp.path),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Text(
-                        'Woptio',
+                        'SKZ Client',
                         style: TextStyle(
                           color: themeProv.isDarkMode
                               ? AppColors.textPrimaryDark
@@ -90,19 +87,19 @@ class DashboardDrawer extends StatelessWidget {
                         isDarkMode: themeProv.isDarkMode,
                         onTap: () {
                           context.go(RouteNames.dashbord);
-                          nav.goBack();
+                          Navigator.of(context).pop();
                         },
                       ),
-                      DrawerMenuItem(
-                        icon: Icons.people_rounded,
-                        title: 'Clients',
-                        isActive: currentRoute == RouteNames.client,
-                        isDarkMode: themeProv.isDarkMode,
-                        onTap: () {
-                          nav.toClientScreen();
-                          nav.goBack();
-                        },
-                      ),
+                      // DrawerMenuItem(
+                      //   icon: Icons.people_rounded,
+                      //   title: 'Clients',
+                      //   isActive: currentRoute == RouteNames.client,
+                      //   isDarkMode: themeProv.isDarkMode,
+                      //   onTap: () {
+                      //     nav.toClientScreen();
+                      //     Navigator.of(context).pop();
+                      //   },
+                      // ),
                       DrawerMenuItem(
                         icon: Icons.folder_rounded,
                         title: 'Projects',
@@ -110,7 +107,7 @@ class DashboardDrawer extends StatelessWidget {
                         isDarkMode: themeProv.isDarkMode,
                         onTap: () {
                           context.go(RouteNames.projects);
-                          nav.goBack();
+                          Navigator.of(context).pop();
                         },
                       ),
                       DrawerMenuItem(
@@ -120,7 +117,7 @@ class DashboardDrawer extends StatelessWidget {
                         isDarkMode: themeProv.isDarkMode,
                         onTap: () {
                           context.go(RouteNames.invoices);
-                          nav.goBack();
+                          Navigator.of(context).pop();
                         },
                       ),
                       DrawerMenuItem(
@@ -173,13 +170,17 @@ class DashboardDrawer extends StatelessWidget {
                                     width: 40.w,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: AppColors.primaryColor.withOpacity(
-                                        themeProv.isDarkMode ? 0.3 : 0.2,
+                                      color: AppColors.primaryColor.withValues(
+                                        alpha: themeProv.isDarkMode ? 0.3 : 0.2,
                                       ),
                                     ),
                                     child: Center(
                                       child: Text(
-                                        'JD',
+                                        auth.userName != null
+                                            ? auth.userName!
+                                                  .substring(0, 2)
+                                                  .toUpperCase()
+                                            : '',
                                         style: TextStyle(
                                           color: themeProv.isDarkMode
                                               ? AppColors.primaryColor
@@ -322,25 +323,3 @@ class DrawerMenuItem extends StatelessWidget {
     );
   }
 }
-
-// // Example usage in a Scaffold:
-// class DashboardScreen extends StatelessWidget {
-//   const DashboardScreen({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: const Text('Dashboard'),
-//         backgroundColor: Colors.white,
-//         elevation: 0,
-//         iconTheme: const IconThemeData(color: Colors.black),
-//       ),
-//       drawer: const DashboardDrawer(),
-//       body: Container(
-//         color: const Color(0xFFF5F5F5),
-//         child: const Center(child: Text('Dashboard Content')),
-//       ),
-//     );
-//   }
-// }

@@ -255,7 +255,7 @@ class _InvoiceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProv = context.watch<ThemeProvider>();
     final status = invoice.status ?? 'unpaid';
-    final amount = invoice.totalAmount ?? 0;
+    // final amount = invoice.totalAmount ?? 0;
     final invoiceNumber = invoice.invoiceNumber ?? '';
     final issueDate = invoice.issueDate;
 

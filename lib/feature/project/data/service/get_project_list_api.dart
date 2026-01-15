@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:project_management/db/service/login/login_local_service.dart';
 import 'package:project_management/feature/project/model/get_project_details_response_model.dart';
 import 'package:project_management/feature/project/model/get_project_list_response_model.dart';
 import 'package:project_management/shared/networks/dio/base_api.dart';
@@ -19,7 +20,7 @@ final class GetProjectListApi extends BaseApi {
     String orderBy = 'desc',
     String? role,
     String? status,
-    required String? userId,
+    // String userId = LoginLocalService().userId ?? "",
   }) async {
     // Build query parameters
     final Map<String, dynamic> queryParams = {
@@ -37,8 +38,8 @@ final class GetProjectListApi extends BaseApi {
     if (status != null && status.isNotEmpty) {
       queryParams['status'] = status;
     }
-    if (userId != null && userId.isNotEmpty) {
-      queryParams['userId'] = userId;
+    if (true) {
+      queryParams['userId'] = LoginLocalService().userId;
     }
 
     log("Fetching project list with params: $queryParams");

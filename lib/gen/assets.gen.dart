@@ -32,9 +32,13 @@ class $AssetsImagesGen {
   AssetGenImage get fullAppIcon =>
       const AssetGenImage('assets/images/full_app_icon.png');
 
+  /// File path: assets/images/skz_client_in_app.png
+  AssetGenImage get skzClientInApp =>
+      const AssetGenImage('assets/images/skz_client_in_app.png');
+
   /// List of all assets
   List<AssetGenImage> get values =>
-      [appIcon, appIconOriginal, appIconSkz, fullAppIcon];
+      [appIcon, appIconOriginal, appIconSkz, fullAppIcon, skzClientInApp];
 }
 
 class $AssetsJsonGen {

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:project_management/app/provider/theme_provider.dart';
 import 'package:project_management/app/router/config/route_names.dart';
+import 'package:project_management/db/service/login/login_local_service.dart';
 import 'package:project_management/feature/dashboard/presentation/view_model/dashbord_vm.dart';
 import 'package:project_management/feature/dashboard/presentation/widgets/bar_chart_card.dart';
 import 'package:project_management/feature/dashboard/presentation/widgets/earnings_card.dart';
@@ -138,14 +139,15 @@ class _DashboardContent extends StatelessWidget {
             },
             child: CircleAvatar(
               radius: 18,
-              backgroundColor: AppColors.primaryColor.withOpacity(
-                themeProv.isDarkMode ? .3 : .2,
+              backgroundColor: AppColors.primaryColor.withValues(
+                alpha: themeProv.isDarkMode ? .3 : .2,
               ),
               child: Text(
-                // authProvider.currentUser?['name']
-                //         ?.substring(0, 1)
-                //         .toUpperCase() ??
-                'S',
+                LoginLocalService().userName != null
+                    ? LoginLocalService().userName!
+                          .substring(0, 2)
+                          .toUpperCase()
+                    : '',
                 style: TextStyle(
                   color: themeProv.isDarkMode
                       ? AppColors.primaryColor
