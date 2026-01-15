@@ -12,6 +12,7 @@ import 'package:project_management/feature/profile/presentation/view/profile_scr
 import 'package:project_management/feature/project/presentation/view/project_details.dart';
 import 'package:project_management/feature/project/presentation/view/project_edit_screen.dart';
 import 'package:project_management/feature/project/presentation/view/project_screen.dart';
+import 'package:project_management/feature/setting/view/setting_screen.dart';
 import 'package:project_management/start/loading_screen.dart';
 
 import '../../utils/di.dart';
@@ -54,6 +55,14 @@ class AppRouter {
           builder: (_, state) {
             // final data = state.extra as Map;
             return ClientScreen();
+          },
+        ),
+        GoRoute(
+          path: RouteNames.setting,
+          name: RouteNames.setting.name,
+          builder: (_, state) {
+            // final data = state.extra as Map;
+            return SettingsScreen();
           },
         ),
 

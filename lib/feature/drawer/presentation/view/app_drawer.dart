@@ -142,7 +142,10 @@ class DashboardDrawer extends StatelessWidget {
                         icon: Icons.settings_rounded,
                         title: 'Settings',
                         isDarkMode: themeProv.isDarkMode,
-                        onTap: () {},
+                        onTap: () {
+                          nav.toSettingScreen();
+                          Navigator.of(context).pop();
+                        },
                       ),
                     ],
                   ),

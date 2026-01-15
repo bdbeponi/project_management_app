@@ -38,6 +38,7 @@ class RouteNames {
   //======================
 
   static const String client = "/client";
+  static const String setting = "/setting";
 }
 
 extension AppRoutesName on String {

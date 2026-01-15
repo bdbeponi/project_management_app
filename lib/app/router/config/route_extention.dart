@@ -28,4 +28,5 @@ extension NavHelpers on NavigationService {
   void toEditProject() => pushNamed(RouteNames.editProject.name);
 
   void toClientScreen() => pushNamed(RouteNames.client.name);
+  void toSettingScreen() => pushNamed(RouteNames.setting.name);
 }
