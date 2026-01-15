@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_management/app/provider/theme_provider.dart';
+import 'package:project_management/gen/colors.gen.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -8,68 +9,87 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    // final authProvider = Provider.of<AuthProvider>(context);
-    // final user = authProvider.currentUser;
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProv, _) {
+        return Scaffold(
+          backgroundColor: themeProv.isDarkMode
+              ? AppColors.backgroundDark
+              : AppColors.backgroundColor,
+          appBar: AppBar(
+            backgroundColor: themeProv.isDarkMode
+                ? AppColors.backgroundDark
+                : AppColors.backgroundColor,
+            iconTheme: IconThemeData(
+              color: themeProv.isDarkMode
+                  ? AppColors.iconDark
+                  : AppColors.iconColor,
+            ),
+            title: Text(
+              'Settings',
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
+            ),
+          ),
+          body: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              // User Profile Card
+              // _buildProfileCard(context, user),
+              const SizedBox(height: 24),
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Settings',
-          style: TextStyle(fontWeight: FontWeight.w700),
-        ),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          // User Profile Card
-          // _buildProfileCard(context, user),
-          const SizedBox(height: 24),
+              // Appearance Section
+              _buildSectionHeader('Appearance', themeProv),
+              const SizedBox(height: 12),
+              _buildThemeCard(context, themeProv),
+              const SizedBox(height: 24),
 
-          // Appearance Section
-          _buildSectionHeader('Appearance'),
-          const SizedBox(height: 12),
-          _buildThemeCard(context, themeProvider),
-          const SizedBox(height: 24),
+              // Notifications Section
+              _buildSectionHeader('Notifications', themeProv),
+              const SizedBox(height: 12),
+              _buildNotificationSettings(context, themeProv),
+              const SizedBox(height: 24),
 
-          // Notifications Section
-          _buildSectionHeader('Notifications'),
-          const SizedBox(height: 12),
-          _buildNotificationSettings(context),
-          const SizedBox(height: 24),
+              // Account Section
+              _buildSectionHeader('Account', themeProv),
+              const SizedBox(height: 12),
+              _buildAccountSettings(context, themeProv),
+              const SizedBox(height: 24),
 
-          // Account Section
-          _buildSectionHeader('Account'),
-          const SizedBox(height: 12),
-          _buildAccountSettings(context),
-          const SizedBox(height: 24),
+              // About Section
+              _buildSectionHeader('About', themeProv),
+              const SizedBox(height: 12),
+              _buildAboutSettings(context, themeProv),
+              const SizedBox(height: 24),
 
-          // About Section
-          _buildSectionHeader('About'),
-          const SizedBox(height: 12),
-          _buildAboutSettings(context),
-          const SizedBox(height: 24),
+              // Logout Button
+              // _buildLogoutButton(context, authProvider),
+              const SizedBox(height: 32),
 
-          // Logout Button
-          // _buildLogoutButton(context, authProvider),
-          const SizedBox(height: 32),
-
-          // Version Info
-          _buildVersionInfo(),
-        ],
-      ),
+              // Version Info
+              _buildVersionInfo(themeProv),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, ThemeProvider themeProv) {
     return Padding(
       padding: const EdgeInsets.only(left: 4),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w700,
           letterSpacing: 0.5,
+          color: themeProv.isDarkMode
+              ? AppColors.textPrimaryDark
+              : AppColors.textPrimary,
         ),
       ),
     );
@@ -158,47 +178,61 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildThemeCard(BuildContext context, ThemeProvider themeProvider) {
+  Widget _buildThemeCard(BuildContext context, ThemeProvider themeProv) {
     return Card(
+      color: themeProv.isDarkMode ? AppColors.cardDark : AppColors.cardColor,
       child: Column(
         children: [
           SwitchListTile(
             secondary: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
-                themeProvider.isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                themeProv.isDarkMode ? Icons.dark_mode : Icons.light_mode,
                 color: Theme.of(context).colorScheme.primary,
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Dark Mode',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
-              themeProvider.isDarkMode ? 'Enabled' : 'Disabled',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              themeProv.isDarkMode ? 'Enabled' : 'Disabled',
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
-            value: themeProvider.isDarkMode,
+            value: themeProv.isDarkMode,
             onChanged: (value) {
               HapticFeedback.selectionClick();
-              themeProvider.toggleTheme();
+              themeProv.toggleTheme();
             },
           ),
-          const Divider(height: 1),
+          Divider(
+            height: 1,
+            color: themeProv.isDarkMode ? Colors.grey[700] : Colors.grey[300],
+          ),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -207,15 +241,30 @@ class SettingsScreen extends StatelessWidget {
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Language',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
               'English',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: Icon(
+              Icons.chevron_right,
+              color: themeProv.isDarkMode
+                  ? AppColors.iconDark
+                  : AppColors.iconColor,
+            ),
             onTap: () {
               HapticFeedback.lightImpact();
               _showLanguageDialog(context);
@@ -226,17 +275,21 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationSettings(BuildContext context) {
+  Widget _buildNotificationSettings(
+    BuildContext context,
+    ThemeProvider themeProv,
+  ) {
     return Card(
+      color: themeProv.isDarkMode ? AppColors.cardDark : AppColors.cardColor,
       child: Column(
         children: [
           SwitchListTile(
             secondary: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -245,13 +298,23 @@ class SettingsScreen extends StatelessWidget {
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Push Notifications',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
               'Receive push notifications',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
             value: true,
             onChanged: (value) {
@@ -259,14 +322,17 @@ class SettingsScreen extends StatelessWidget {
               // TODO: Toggle push notifications
             },
           ),
-          const Divider(height: 1),
+          Divider(
+            height: 1,
+            color: themeProv.isDarkMode ? Colors.grey[700] : Colors.grey[300],
+          ),
           SwitchListTile(
             secondary: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -275,13 +341,23 @@ class SettingsScreen extends StatelessWidget {
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Email Notifications',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
               'Receive email updates',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
             value: true,
             onChanged: (value) {
@@ -289,14 +365,17 @@ class SettingsScreen extends StatelessWidget {
               // TODO: Toggle email notifications
             },
           ),
-          const Divider(height: 1),
+          Divider(
+            height: 1,
+            color: themeProv.isDarkMode ? Colors.grey[700] : Colors.grey[300],
+          ),
           SwitchListTile(
             secondary: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -305,13 +384,23 @@ class SettingsScreen extends StatelessWidget {
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Haptic Feedback',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
               'Vibrate on interactions',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
             value: true,
             onChanged: (value) {
@@ -324,17 +413,18 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAccountSettings(BuildContext context) {
+  Widget _buildAccountSettings(BuildContext context, ThemeProvider themeProv) {
     return Card(
+      color: themeProv.isDarkMode ? AppColors.cardDark : AppColors.cardColor,
       child: Column(
         children: [
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -343,28 +433,46 @@ class SettingsScreen extends StatelessWidget {
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Change Password',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
               'Update your password',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: Icon(
+              Icons.chevron_right,
+              color: themeProv.isDarkMode
+                  ? AppColors.iconDark
+                  : AppColors.iconColor,
+            ),
             onTap: () {
               HapticFeedback.lightImpact();
               _showChangePasswordDialog(context);
             },
           ),
-          const Divider(height: 1),
+          Divider(
+            height: 1,
+            color: themeProv.isDarkMode ? Colors.grey[700] : Colors.grey[300],
+          ),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -373,28 +481,46 @@ class SettingsScreen extends StatelessWidget {
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Privacy & Security',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
               'Manage your privacy settings',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: Icon(
+              Icons.chevron_right,
+              color: themeProv.isDarkMode
+                  ? AppColors.iconDark
+                  : AppColors.iconColor,
+            ),
             onTap: () {
               HapticFeedback.lightImpact();
               // TODO: Navigate to privacy settings
             },
           ),
-          const Divider(height: 1),
+          Divider(
+            height: 1,
+            color: themeProv.isDarkMode ? Colors.grey[700] : Colors.grey[300],
+          ),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -403,15 +529,30 @@ class SettingsScreen extends StatelessWidget {
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Storage & Data',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
               'Manage app storage',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: Icon(
+              Icons.chevron_right,
+              color: themeProv.isDarkMode
+                  ? AppColors.iconDark
+                  : AppColors.iconColor,
+            ),
             onTap: () {
               HapticFeedback.lightImpact();
               _showStorageDialog(context);
@@ -422,17 +563,18 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAboutSettings(BuildContext context) {
+  Widget _buildAboutSettings(BuildContext context, ThemeProvider themeProv) {
     return Card(
+      color: themeProv.isDarkMode ? AppColors.cardDark : AppColors.cardColor,
       child: Column(
         children: [
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -441,28 +583,46 @@ class SettingsScreen extends StatelessWidget {
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Help & Support',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
               'Get help and contact us',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: Icon(
+              Icons.chevron_right,
+              color: themeProv.isDarkMode
+                  ? AppColors.iconDark
+                  : AppColors.iconColor,
+            ),
             onTap: () {
               HapticFeedback.lightImpact();
               // TODO: Navigate to help
             },
           ),
-          const Divider(height: 1),
+          Divider(
+            height: 1,
+            color: themeProv.isDarkMode ? Colors.grey[700] : Colors.grey[300],
+          ),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -471,28 +631,46 @@ class SettingsScreen extends StatelessWidget {
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Terms & Conditions',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
               'Read our terms',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: Icon(
+              Icons.chevron_right,
+              color: themeProv.isDarkMode
+                  ? AppColors.iconDark
+                  : AppColors.iconColor,
+            ),
             onTap: () {
               HapticFeedback.lightImpact();
               // TODO: Show terms
             },
           ),
-          const Divider(height: 1),
+          Divider(
+            height: 1,
+            color: themeProv.isDarkMode ? Colors.grey[700] : Colors.grey[300],
+          ),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -501,28 +679,46 @@ class SettingsScreen extends StatelessWidget {
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Privacy Policy',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
               'Read our privacy policy',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: Icon(
+              Icons.chevron_right,
+              color: themeProv.isDarkMode
+                  ? AppColors.iconDark
+                  : AppColors.iconColor,
+            ),
             onTap: () {
               HapticFeedback.lightImpact();
               // TODO: Show privacy policy
             },
           ),
-          const Divider(height: 1),
+          Divider(
+            height: 1,
+            color: themeProv.isDarkMode ? Colors.grey[700] : Colors.grey[300],
+          ),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -531,28 +727,46 @@ class SettingsScreen extends StatelessWidget {
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Share App',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
               'Share with friends',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: Icon(
+              Icons.chevron_right,
+              color: themeProv.isDarkMode
+                  ? AppColors.iconDark
+                  : AppColors.iconColor,
+            ),
             onTap: () {
               HapticFeedback.lightImpact();
               // TODO: Share app
             },
           ),
-          const Divider(height: 1),
+          Divider(
+            height: 1,
+            color: themeProv.isDarkMode ? Colors.grey[700] : Colors.grey[300],
+          ),
           ListTile(
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Theme.of(
-                  context,
-                ).colorScheme.primary.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(
+                  alpha: themeProv.isDarkMode ? 0.3 : 0.1,
+                ),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -561,15 +775,30 @@ class SettingsScreen extends StatelessWidget {
                 size: 24,
               ),
             ),
-            title: const Text(
+            title: Text(
               'Rate App',
-              style: TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: themeProv.isDarkMode
+                    ? AppColors.textPrimaryDark
+                    : AppColors.textPrimary,
+              ),
             ),
             subtitle: Text(
               'Rate us on the store',
-              style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+              style: TextStyle(
+                fontSize: 13,
+                color: themeProv.isDarkMode
+                    ? AppColors.textHint
+                    : AppColors.textHintDark,
+              ),
             ),
-            trailing: const Icon(Icons.chevron_right),
+            trailing: Icon(
+              Icons.chevron_right,
+              color: themeProv.isDarkMode
+                  ? AppColors.iconDark
+                  : AppColors.iconColor,
+            ),
             onTap: () {
               HapticFeedback.lightImpact();
               // TODO: Open store rating
@@ -608,7 +837,7 @@ class SettingsScreen extends StatelessWidget {
   //   );
   // }
 
-  Widget _buildVersionInfo() {
+  Widget _buildVersionInfo(ThemeProvider themeProv) {
     return Center(
       child: Column(
         children: [
@@ -617,18 +846,30 @@ class SettingsScreen extends StatelessWidget {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+              color: themeProv.isDarkMode
+                  ? AppColors.textHint
+                  : AppColors.textHintDark,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             'Version 1.0.0',
-            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+            style: TextStyle(
+              fontSize: 12,
+              color: themeProv.isDarkMode
+                  ? AppColors.textHint
+                  : AppColors.textHintDark,
+            ),
           ),
           const SizedBox(height: 8),
           Text(
             '© 2025 Skillers Zone LLC',
-            style: TextStyle(fontSize: 11, color: Colors.grey[500]),
+            style: TextStyle(
+              fontSize: 11,
+              color: themeProv.isDarkMode
+                  ? AppColors.textHint
+                  : AppColors.textHintDark,
+            ),
           ),
         ],
       ),

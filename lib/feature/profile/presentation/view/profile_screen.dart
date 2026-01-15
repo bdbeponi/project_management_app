@@ -510,7 +510,16 @@ class ProfileScreen extends StatelessWidget {
           body: profileVm.isLoading
               ? const Center(child: CircularProgressIndicator())
               : profileVm.errorMessage != null
-              ? Center(child: Text(profileVm.errorMessage!))
+              ? Center(
+                  child: Text(
+                    profileVm.errorMessage!,
+                    style: TextStyle(
+                      color: themeProv.isDarkMode
+                          ? AppColors.textPrimaryDark
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                )
               : RefreshIndicator(
                   onRefresh: () => profileVm.refreshProfile(),
                   child: SingleChildScrollView(
@@ -776,8 +785,8 @@ class ProfileScreen extends StatelessWidget {
         fontSize: 16,
         fontWeight: FontWeight.w600,
         color: themeProv.isDarkMode
-            ? AppColors.backgroundColor
-            : AppColors.backgroundDark,
+            ? AppColors.textPrimaryDark
+            : AppColors.textPrimary,
       ),
     );
   }
@@ -794,10 +803,24 @@ class ProfileScreen extends StatelessWidget {
       color: themeProv.isDarkMode ? AppColors.cardDark : AppColors.cardColor,
       child: ListTile(
         leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
-        title: Text(title),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontSize: 12,
+            color: themeProv.isDarkMode
+                ? AppColors.textHint
+                : AppColors.textHintDark,
+          ),
+        ),
         subtitle: Text(
           value,
-          style: const TextStyle(fontWeight: FontWeight.w600),
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: themeProv.isDarkMode
+                ? AppColors.textPrimaryDark
+                : AppColors.textPrimary,
+          ),
         ),
         // trailing: onTap != null ? const Icon(Icons.edit_outlined) : null,
         // onTap: onTap,

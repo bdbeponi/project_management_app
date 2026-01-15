@@ -463,88 +463,120 @@ class _InvoicesContentState extends State<_InvoicesContent> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Filter Invoices',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+      builder: (context) => Consumer<ThemeProvider>(
+        builder: (context, themeProv, _) {
+          return Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: themeProv.isDarkMode
+                  ? AppColors.backgroundDark
+                  : AppColors.backgroundColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
             ),
-            const SizedBox(height: 24),
-            const Text(
-              'Date Range',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 12),
-            Wrap(
-              spacing: 8,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ChoiceChip(
-                  label: const Text('This Month'),
-                  selected: true,
-                  onSelected: (_) {
-                    final now = DateTime.now();
-                    final firstDayOfMonth = DateTime(now.year, now.month, 1);
-                    provider.fetchInvoices(
-                      startDate: firstDayOfMonth,
-                      endDate: now,
-                    );
-                    Navigator.pop(context);
-                  },
+                Text(
+                  'Filter Invoices',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: themeProv.isDarkMode
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
+                  ),
                 ),
-                ChoiceChip(
-                  label: const Text('Last Month'),
-                  selected: false,
-                  onSelected: (_) {
-                    final now = DateTime.now();
-                    final lastMonth = DateTime(now.year, now.month - 1, 1);
-                    final firstDayOfThisMonth = DateTime(
-                      now.year,
-                      now.month,
-                      1,
-                    );
-                    provider.fetchInvoices(
-                      startDate: lastMonth,
-                      endDate: firstDayOfThisMonth,
-                    );
-                    Navigator.pop(context);
-                  },
+                const SizedBox(height: 24),
+                Text(
+                  'Date Range',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: themeProv.isDarkMode
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
+                  ),
                 ),
-                ChoiceChip(
-                  label: const Text('This Year'),
-                  selected: false,
-                  onSelected: (_) {
-                    final now = DateTime.now();
-                    final firstDayOfYear = DateTime(now.year, 1, 1);
-                    provider.fetchInvoices(
-                      startDate: firstDayOfYear,
-                      endDate: now,
-                    );
-                    Navigator.pop(context);
-                  },
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 8,
+                  children: [
+                    ChoiceChip(
+                      label: const Text('This Month'),
+                      selected: true,
+                      onSelected: (_) {
+                        final now = DateTime.now();
+                        final firstDayOfMonth = DateTime(
+                          now.year,
+                          now.month,
+                          1,
+                        );
+                        provider.fetchInvoices(
+                          startDate: firstDayOfMonth,
+                          endDate: now,
+                        );
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ChoiceChip(
+                      label: const Text('Last Month'),
+                      selected: false,
+                      onSelected: (_) {
+                        final now = DateTime.now();
+                        final lastMonth = DateTime(now.year, now.month - 1, 1);
+                        final firstDayOfThisMonth = DateTime(
+                          now.year,
+                          now.month,
+                          1,
+                        );
+                        provider.fetchInvoices(
+                          startDate: lastMonth,
+                          endDate: firstDayOfThisMonth,
+                        );
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ChoiceChip(
+                      label: const Text('This Year'),
+                      selected: false,
+                      onSelected: (_) {
+                        final now = DateTime.now();
+                        final firstDayOfYear = DateTime(now.year, 1, 1);
+                        provider.fetchInvoices(
+                          startDate: firstDayOfYear,
+                          endDate: now,
+                        );
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      provider.clearFilters();
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: themeProv.isDarkMode
+                          ? AppColors.cardDark
+                          : Colors.grey[200],
+                      foregroundColor: themeProv.isDarkMode
+                          ? AppColors.textPrimaryDark
+                          : Colors.grey[800],
+                    ),
+                    child: const Text('Clear Filters'),
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  provider.clearFilters();
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[200],
-                  foregroundColor: Colors.grey[800],
-                ),
-                child: const Text('Clear Filters'),
-              ),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
