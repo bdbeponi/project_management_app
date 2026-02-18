@@ -7,6 +7,7 @@ import 'package:project_management/shared/networks/dio/dio.dart';
 import 'package:project_management/shared/networks/endpoints.dart';
 
 final class ClientApi extends BaseApi {
+  
   ClientApi._internal();
   static final ClientApi _singleton = ClientApi._internal();
   static ClientApi get instance => _singleton;

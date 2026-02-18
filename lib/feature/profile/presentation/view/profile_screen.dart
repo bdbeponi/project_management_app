@@ -480,6 +480,7 @@
 //     );
 //   }
 // }
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_management/app/provider/theme_provider.dart';
@@ -873,7 +874,7 @@ class ProfileScreen extends StatelessWidget {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () async {
-              Navigator.pop(context);
+              // Navigator.pop(context);
               await LoginLocalService().clearLoginData();
               context.read<ProfileVm>().clearProfile();
               nav.toLogin();

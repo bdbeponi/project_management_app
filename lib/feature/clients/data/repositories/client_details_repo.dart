@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:project_management/feature/clients/data/services/client_api.dart';
 import 'package:project_management/feature/clients/model/client_details_response_model.dart';
 

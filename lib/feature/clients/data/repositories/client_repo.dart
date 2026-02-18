@@ -12,11 +12,11 @@ class ClientRepository {
   int _totalItems = 0;
   int _pageSize = 10;
 
-  String _currentSearch = '';
+  String _currentSearch = '';  
   String _currentOrderBy = 'desc';
   String? _currentRole;
   String? _currentStatus;
-
+ 
   // Cache
   final Map<String, List<Item>> _searchCache = {};
 

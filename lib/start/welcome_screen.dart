@@ -12,7 +12,7 @@ final class WelcomeScreen extends StatelessWidget {
       body: Center(
         child: SizedBox(
           width: 160.w,
-          child: Image.asset(Assets.images.appIconSkz.path),
+          child: Image.asset(Assets.images.skzClientInApp.path),
         ),
       ),
     );

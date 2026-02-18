@@ -508,9 +508,9 @@ class _LoginScreenState extends State<LoginScreen>
                             isDark: isDark,
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 0),
                         _Logo(),
-                        const SizedBox(height: 48),
+                        const SizedBox(height: 0),
                         _LoginCard(
                           formKey: _formKey,
                           vm: vm,
@@ -599,10 +599,13 @@ class _Logo extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 150,
+      height: 200,
       child: Padding(
         padding: EdgeInsets.all(24.sp),
-        child: Image.asset(Assets.images.fullAppIcon.path, fit: BoxFit.contain),
+        child: Image.asset(
+          Assets.images.skzClientInApp.path,
+          fit: BoxFit.contain,
+        ),
       ),
     );
   }
@@ -646,7 +649,7 @@ class _LoginCard extends StatelessWidget {
               const SizedBox(height: 28),
               _buildSignInButton(context),
               const SizedBox(height: 16),
-              _buildAutoFillButton(),
+              // _buildAutoFillButton(),
             ],
           ),
         ),
