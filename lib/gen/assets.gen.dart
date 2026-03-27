@@ -1,5 +1,3 @@
-// dart format width=80
-
 /// GENERATED CODE - DO NOT MODIFY BY HAND
 /// *****************************************************
 ///  FlutterGen
@@ -7,7 +5,7 @@
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
-// ignore_for_file: deprecated_member_use,directives_ordering,implicit_dynamic_list_literal,unnecessary_import
+// ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
 
 import 'package:flutter/widgets.dart';
 
@@ -22,12 +20,25 @@ class $AssetsImagesGen {
   AssetGenImage get appIcon =>
       const AssetGenImage('assets/images/app_Icon.png');
 
+  /// File path: assets/images/app_Icon_original.png
+  AssetGenImage get appIconOriginal =>
+      const AssetGenImage('assets/images/app_Icon_original.png');
+
+  /// File path: assets/images/app_icon_skz.png
+  AssetGenImage get appIconSkz =>
+      const AssetGenImage('assets/images/app_icon_skz.png');
+
   /// File path: assets/images/full_app_icon.png
   AssetGenImage get fullAppIcon =>
       const AssetGenImage('assets/images/full_app_icon.png');
 
+  /// File path: assets/images/skz_client_in_app.png
+  AssetGenImage get skzClientInApp =>
+      const AssetGenImage('assets/images/skz_client_in_app.png');
+
   /// List of all assets
-  List<AssetGenImage> get values => [appIcon, fullAppIcon];
+  List<AssetGenImage> get values =>
+      [appIcon, appIconOriginal, appIconSkz, fullAppIcon, skzClientInApp];
 }
 
 class $AssetsJsonGen {
@@ -53,14 +64,12 @@ class AssetGenImage {
     this._assetName, {
     this.size,
     this.flavors = const {},
-    this.animation,
   });
 
   final String _assetName;
 
   final Size? size;
   final Set<String> flavors;
-  final AssetGenImageAnimation? animation;
 
   Image image({
     Key? key,
@@ -115,23 +124,18 @@ class AssetGenImage {
     );
   }
 
-  ImageProvider provider({AssetBundle? bundle, String? package}) {
-    return AssetImage(_assetName, bundle: bundle, package: package);
+  ImageProvider provider({
+    AssetBundle? bundle,
+    String? package,
+  }) {
+    return AssetImage(
+      _assetName,
+      bundle: bundle,
+      package: package,
+    );
   }
 
   String get path => _assetName;
 
   String get keyName => _assetName;
-}
-
-class AssetGenImageAnimation {
-  const AssetGenImageAnimation({
-    required this.isAnimation,
-    required this.duration,
-    required this.frames,
-  });
-
-  final bool isAnimation;
-  final Duration duration;
-  final int frames;
 }

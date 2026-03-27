@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:project_management/app/provider/theme_provider.dart';
+import 'package:project_management/gen/colors.gen.dart';
+import 'package:provider/provider.dart';
 
 class StatCard extends StatelessWidget {
   final String title;
@@ -22,62 +25,82 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProv, _) {
+        return Card(
+          color: themeProv.isDarkMode
+              ? AppColors.cardDark
+              : AppColors.cardColor,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: iconColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: iconColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(icon, color: iconColor, size: 24),
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.more_vert,
+                        size: 20,
+                        color: themeProv.isDarkMode
+                            ? AppColors.iconDark
+                            : AppColors.iconColor,
+                      ),
+                      onPressed: () {},
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: themeProv.isDarkMode
+                        ? AppColors.textHint
+                        : AppColors.textHintDark,
+                    fontWeight: FontWeight.w500,
                   ),
-                  child: Icon(icon, color: iconColor, size: 24),
                 ),
-                IconButton(
-                  icon: Icon(Icons.more_vert, size: 20, color: Colors.grey[400]),
-                  onPressed: () {},
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+                const SizedBox(height: 8),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: themeProv.isDarkMode
+                        ? AppColors.textPrimaryDark
+                        : AppColors.textPrimary,
+                  ),
                 ),
+                const SizedBox(height: 8),
+                if (showChart && chartData != null)
+                  _buildMiniChart()
+                else
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: themeProv.isDarkMode
+                          ? AppColors.textHint
+                          : AppColors.textHintDark,
+                    ),
+                  ),
               ],
             ),
-            const SizedBox(height: 16),
-            Text(
-              title,
-              style: TextStyle(
-                fontSize: 13,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 8),
-            if (showChart && chartData != null)
-              _buildMiniChart()
-            else
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[500],
-                ),
-              ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

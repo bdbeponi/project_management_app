@@ -4,11 +4,15 @@ import 'package:project_management/app/router/config/navigation_service.dart';
 import 'package:project_management/app/router/config/route_names.dart';
 import 'package:project_management/app/router/routes/auth_route.dart';
 import 'package:project_management/feature/bottom_nav_bar.dart';
+import 'package:project_management/feature/clients/presentation/view/client_screen.dart';
 import 'package:project_management/feature/dashboard/presentation/view/dashbord_screen.dart';
 import 'package:project_management/feature/dummy_screens.dart';
 import 'package:project_management/feature/invoices/presentation/view/invoice_screen.dart';
 import 'package:project_management/feature/profile/presentation/view/profile_screen.dart';
+import 'package:project_management/feature/project/presentation/view/project_details.dart';
+import 'package:project_management/feature/project/presentation/view/project_edit_screen.dart';
 import 'package:project_management/feature/project/presentation/view/project_screen.dart';
+import 'package:project_management/feature/setting/view/setting_screen.dart';
 import 'package:project_management/start/loading_screen.dart';
 
 import '../../utils/di.dart';
@@ -25,6 +29,41 @@ class AppRouter {
         GoRoute(
           path: RouteNames.initialLoading,
           builder: (_, _) => const Loading(),
+        ),
+        GoRoute(
+          path: RouteNames.projectDetails,
+          name: RouteNames.projectDetails.name,
+          builder: (_, state) {
+            final data = state.extra as Map;
+            return ProjectDetailsScreen(
+              projectId: data["projectId"] ?? "",
+              projectName: data["projectName"] ?? "",
+            );
+          },
+        ),
+        GoRoute(
+          path: RouteNames.editProject,
+          name: RouteNames.editProject.name,
+          builder: (_, state) {
+            // final data = state.extra as Map;
+            return EditProjectScreen();
+          },
+        ),
+        GoRoute(
+          path: RouteNames.client,
+          name: RouteNames.client.name,
+          builder: (_, state) {
+            // final data = state.extra as Map;
+            return ClientScreen();
+          },
+        ),
+        GoRoute(
+          path: RouteNames.setting,
+          name: RouteNames.setting.name,
+          builder: (_, state) {
+            // final data = state.extra as Map;
+            return SettingsScreen();
+          },
         ),
 
         // // Bottom navigation shell

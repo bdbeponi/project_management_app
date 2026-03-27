@@ -18,4 +18,15 @@ extension NavHelpers on NavigationService {
 
   void toLogin() => goNamed(RouteNames.login.name);
   void toNavigation() => go(RouteNames.dashbord);
+  void toProjectDetails({
+    required String? projectName,
+    required String? projectId,
+  }) => pushNamedWithExtra(
+    RouteNames.projectDetails.name,
+    extra: {"projectId": projectId, "projectName": projectName},
+  );
+  void toEditProject() => pushNamed(RouteNames.editProject.name);
+
+  void toClientScreen() => pushNamed(RouteNames.client.name);
+  void toSettingScreen() => pushNamed(RouteNames.setting.name);
 }
